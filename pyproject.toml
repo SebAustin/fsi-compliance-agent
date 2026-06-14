@@ -1,0 +1,72 @@
+[project]
+name = "fsi-compliance-agent"
+version = "0.1.0"
+description = "LangGraph compliance-review agent for financial services: citation-grounded determinations, conformal abstention, Slack HITL gates, examiner-grade audit log."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+authors = [{ name = "Sebastien Henry" }]
+dependencies = [
+  "langgraph==1.0.3",
+  "anthropic==0.41.0",
+  "qdrant-client==1.12.1",
+  "voyageai==0.3.2",
+  "slack-sdk==3.33.4",
+  "pydantic==2.9.2",
+  "pydantic-settings==2.6.1",
+  "fastapi==0.115.6",
+  "uvicorn[standard]==0.32.0",
+  "httpx==0.28.1",
+  "scipy==1.14.1",
+  "numpy==2.1.3",
+  "structlog==24.4.0",
+  "typer==0.15.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff==0.8.4",
+  "mypy==1.13.0",
+  "pytest==8.3.4",
+  "pytest-asyncio==0.24.0",
+  "pytest-cov==6.0.0",
+  "respx==0.21.1",
+]
+
+[project.scripts]
+compliance-agent = "compliance_agent.api.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/compliance_agent"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests", "evals", "scripts"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+# D: docstring-everywhere; TC001/TC003: we keep domain imports at module top for
+# readability rather than splitting into TYPE_CHECKING blocks; EM/TRY003: inline
+# exception messages are clearer here than message constants.
+ignore = ["D", "COM812", "ISC001", "EM101", "EM102", "TRY003", "TC001", "TC002", "TC003"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "PLR2004", "ANN", "ARG", "SLF001", "E501"]
+"evals/**" = ["T201", "S603", "S607", "E501"]
+"scripts/**" = ["T201", "S603", "S607", "INP001", "E501"]
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "--cov=src/compliance_agent --cov-fail-under=85 -q"
+testpaths = ["tests"]

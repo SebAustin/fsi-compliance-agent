@@ -1,0 +1,48 @@
+# .cursorrules — fsi-compliance-agent
+# Owner: Sebastien Henry (11 yrs regulated FSI). Anchor: FIS / Anthropic FS.
+
+You are pairing with a senior AI engineer with deep financial-services compliance
+experience. Write production code. No tutorials.
+
+## Stack (pinned Jun 2026)
+- Python 3.12.4, uv, ruff 0.8.4, mypy 1.13 --strict, pydantic 2.9.
+- LangGraph 1.0.3 StateGraph + TypedDict. No AgentExecutor.
+- anthropic 0.40.0. Sonnet 4.6 for determinations, Haiku 4.5 for triage,
+  Opus 4.7 for eval judge. Citations API enabled on determinations.
+- qdrant-client 1.12.1 + voyageai 0.3.2 (voyage-3-large, dim 256).
+- slack-sdk 3.33.4 for approval gates. scipy 1.14.1 for conformal calibration.
+- FastAPI 0.115.6, structlog 24.4.0.
+
+## Citation contract (HARD — non-negotiable in compliance)
+- Every compliance determination MUST cite the specific rule(s) it relied on,
+  with the rule_id and the cited clause text (char offsets via Citations API).
+- A determination with no citation is INVALID — raise CitationContractError.
+  In compliance you cannot flag (or clear) a transaction on an uncited basis.
+- The "documents" passed to Citations API are the retrieved rule clauses.
+
+## Abstention contract (HARD)
+- Determinations carry a confidence score. Below the calibrated threshold τ,
+  the agent ABSTAINS and routes to human review. It does NOT guess.
+- Conformal calibration on the labeled case set, alpha=0.05 (stricter than the
+  0.10 used elsewhere — compliance tolerates fewer wrong auto-decisions).
+- Cost asymmetry is explicit: a false negative (missed flag) is far costlier than
+  a false positive (over-flag). The eval and the threshold both reflect this.
+
+## Approval-gate contract
+- Any determination with risk_tier == "high" AND decision == "flag" routes through
+  a Slack approval gate before the case is closed. A human compliance officer
+  approves or overrides. The agent never auto-closes a high-risk flag.
+- Reuse pattern: Slack interactive message with Approve / Override / Request-Info
+  buttons; the gate blocks until a response or a configurable timeout.
+
+## Audit contract (examiner-grade)
+- Every node transition appends to a hash-chained audit log. Each entry:
+  {timestamp, case_id, node, decision, rule_ids_cited, confidence, hash_prev,
+   hash_self}. Append-only. verify() must detect any tampering.
+- The audit log is the artifact a regulator examines. Treat it as the product.
+
+## Forbidden
+- print() in src/ — structlog only.
+- Uncited determinations. Auto-closing high-risk flags without the approval gate.
+- Hardcoded thresholds — always from config/calibration.
+- Copying real regulatory text. The rulebook is synthetic and originally authored.

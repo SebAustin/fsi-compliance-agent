@@ -1,0 +1,80 @@
+{"case_id":"c-001","case_text":"Customer deposited $4,500 cash on Monday and $4,800 cash on Tuesday at two different branches.","label":"flag","expected_rule":"AML-002","risk_tier":"high"}
+{"case_id":"c-002","case_text":"Routine payroll deposit of $3,200 from a long-standing employer.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-003","case_text":"Wire transfer of $25,000 to a verified domestic vendor with prior transaction history.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"c-004","case_text":"New payee added in a designated high-risk jurisdiction; first transfer of $9,500.","label":"flag","expected_rule":"AML-003","risk_tier":"high"}
+{"case_id":"c-005","case_text":"Legal entity account where beneficial owners have not completed verification; outbound transfer of $50,000 requested.","label":"flag","expected_rule":"AML-005","risk_tier":"high"}
+{"case_id":"c-006","case_text":"Single cash deposit of $14,000 from a customer; transaction reported as required.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"c-007","case_text":"Customer made three cash deposits of $3,300, $3,400, and $3,500 across three branches within the same business day.","label":"flag","expected_rule":"AML-006","risk_tier":"high"}
+{"case_id":"c-008","case_text":"Outgoing payment to a counterparty whose name is an exact match to a party on the sanctions watchlist.","label":"flag","expected_rule":"AML-007","risk_tier":"high"}
+{"case_id":"c-009","case_text":"Counterparty name is a close but inexact match to a listed sanctions entity; awaiting analyst decision.","label":"needs_review","expected_rule":"AML-007","risk_tier":"high"}
+{"case_id":"c-010","case_text":"Account belonging to a known politically exposed person requests a $40,000 international transfer.","label":"flag","expected_rule":"AML-004","risk_tier":"high"}
+{"case_id":"c-011","case_text":"Monthly utility bill payment of $180 from a personal checking account.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-012","case_text":"Customer deposited $9,900 then withdrew $9,800 by wire to a third party two hours later with no stated purpose.","label":"flag","expected_rule":"AML-011","risk_tier":"high"}
+{"case_id":"c-013","case_text":"A convenience store account deposits cash volumes roughly triple its declared monthly revenue for the business type.","label":"flag","expected_rule":"AML-009","risk_tier":"high"}
+{"case_id":"c-014","case_text":"Outbound wire submitted without complete originator information.","label":"flag","expected_rule":"AML-010","risk_tier":"medium"}
+{"case_id":"c-015","case_text":"Quarterly dividend payment of $1,200 to a verified brokerage account.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-016","case_text":"Deposit of $7,500 funded by an unrelated third party with no documented relationship to the accountholder, recurring weekly.","label":"flag","expected_rule":"AML-012","risk_tier":"high"}
+{"case_id":"c-017","case_text":"A dormant account inactive for two years suddenly receives and forwards $80,000.","label":"flag","expected_rule":"AML-013","risk_tier":"high"}
+{"case_id":"c-018","case_text":"Customer with documented annual income of $45,000 deposits $300,000 with no supporting source-of-wealth documentation.","label":"flag","expected_rule":"AML-014","risk_tier":"high"}
+{"case_id":"c-019","case_text":"Counterparty subject to credible adverse media linking it to financial crime; pending compliance escalation.","label":"needs_review","expected_rule":"AML-015","risk_tier":"high"}
+{"case_id":"c-020","case_text":"Payment routed through a nested correspondent relationship from a respondent bank with weak controls.","label":"flag","expected_rule":"AML-016","risk_tier":"high"}
+{"case_id":"c-021","case_text":"Import invoice values are roughly five times the market value of the goods shipped.","label":"flag","expected_rule":"AML-017","risk_tier":"high"}
+{"case_id":"c-022","case_text":"Customer makes repeated $9,000 round-amount cash deposits weekly with no commercial explanation.","label":"flag","expected_rule":"AML-018","risk_tier":"high"}
+{"case_id":"c-023","case_text":"Standard ACH transfer of $500 between a customer's own linked checking and savings accounts.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-024","case_text":"Customer attempted to move $20,000 in currency across the border without filing the required declaration.","label":"flag","expected_rule":"AML-019","risk_tier":"high"}
+{"case_id":"c-025","case_text":"New legal entity with no operating business, no physical address, and opaque ownership requests a $120,000 transfer.","label":"flag","expected_rule":"AML-020","risk_tier":"high"}
+{"case_id":"c-026","case_text":"Transfer involving the spouse of a senior foreign official for $30,000.","label":"flag","expected_rule":"AML-021","risk_tier":"high"}
+{"case_id":"c-027","case_text":"Transaction structured through a front company with falsified shipping documents to obscure a sanctioned ultimate buyer.","label":"flag","expected_rule":"AML-022","risk_tier":"high"}
+{"case_id":"c-028","case_text":"New account opened but customer identity documents remain unverified; a $6,000 transfer is requested.","label":"flag","expected_rule":"AML-023","risk_tier":"high"}
+{"case_id":"c-029","case_text":"Established customer's transaction pattern changed materially after relocating their business overseas.","label":"needs_review","expected_rule":"AML-024","risk_tier":"medium"}
+{"case_id":"c-030","case_text":"Account receives dozens of small deposits from many unrelated senders followed by a single large out-of-state withdrawal.","label":"flag","expected_rule":"AML-025","risk_tier":"high"}
+{"case_id":"c-031","case_text":"Customer rapidly converts $90,000 from fiat to virtual assets through a service provider, inconsistent with their profile.","label":"flag","expected_rule":"AML-026","risk_tier":"high"}
+{"case_id":"c-032","case_text":"Customer conducted cash transactions of $4,000 each at four branches on the same day, aggregating to $16,000.","label":"flag","expected_rule":"AML-027","risk_tier":"high"}
+{"case_id":"c-033","case_text":"Customer purchases cashier's checks with cash in repeated amounts of $9,500.","label":"flag","expected_rule":"AML-028","risk_tier":"high"}
+{"case_id":"c-034","case_text":"A legal-entity customer changed beneficial owners; the new owners are not yet verified and a transfer is requested.","label":"flag","expected_rule":"AML-029","risk_tier":"high"}
+{"case_id":"c-035","case_text":"Outbound wire of $5,000 to a high-risk geography inconsistent with the customer's prior activity.","label":"flag","expected_rule":"AML-030","risk_tier":"high"}
+{"case_id":"c-036","case_text":"An institution employee's personal account shows transfers deviating sharply from expected personal activity.","label":"needs_review","expected_rule":"AML-031","risk_tier":"medium"}
+{"case_id":"c-037","case_text":"A nonprofit account sends recurring cross-border transfers to a higher-risk region with limited documentation.","label":"needs_review","expected_rule":"AML-032","risk_tier":"high"}
+{"case_id":"c-038","case_text":"Customer exchanged currency in two transactions of $6,000 each on the same day to stay below the threshold.","label":"flag","expected_rule":"AML-033","risk_tier":"high"}
+{"case_id":"c-039","case_text":"A single source of funds was dispersed across five newly opened accounts shortly before onward transfer.","label":"flag","expected_rule":"AML-034","risk_tier":"high"}
+{"case_id":"c-040","case_text":"Customer who stated their occupation as a part-time student shows monthly throughput exceeding $200,000.","label":"flag","expected_rule":"AML-035","risk_tier":"high"}
+{"case_id":"c-041","case_text":"Payment to an entity that is 60 percent owned in aggregate by sanctioned parties, though not itself listed.","label":"flag","expected_rule":"AML-036","risk_tier":"high"}
+{"case_id":"c-042","case_text":"A funds transfer above the recordkeeping threshold was processed but originator records were not retained.","label":"flag","expected_rule":"AML-037","risk_tier":"medium"}
+{"case_id":"c-043","case_text":"Customer repays a large loan in full days after disbursement using funds inconsistent with their profile.","label":"flag","expected_rule":"AML-038","risk_tier":"high"}
+{"case_id":"c-044","case_text":"A movement through an internal concentration account omits the underlying customer's identifying information.","label":"flag","expected_rule":"AML-039","risk_tier":"high"}
+{"case_id":"c-045","case_text":"Customer refuses to provide source-of-funds documentation for a $75,000 deposit.","label":"flag","expected_rule":"AML-040","risk_tier":"high"}
+{"case_id":"c-046","case_text":"Recurring monthly rent payment of $1,800 to a verified landlord.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-047","case_text":"Direct deposit of a $2,500 tax refund from the national revenue agency.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-048","case_text":"Verified business customer pays a recurring $12,000 supplier invoice; activity matches its established profile and is reported.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"c-049","case_text":"Customer transfers $300 to a family member domestically through a verified account.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-050","case_text":"Long-standing retail customer deposits a $1,500 birthday check.","label":"compliant","expected_rule":"","risk_tier":"low"}
+{"case_id":"c-051","case_text":"Customer made cash deposits of $2,000 every day for two weeks, aggregating well above the reporting threshold.","label":"flag","expected_rule":"AML-006","risk_tier":"high"}
+{"case_id":"c-052","case_text":"A small business account suddenly receives a $9,700 wire from an unfamiliar offshore entity.","label":"needs_review","expected_rule":"AML-012","risk_tier":"high"}
+{"case_id":"c-053","case_text":"Counterparty shares a common name with a sanctioned individual but has a different date of birth and nationality.","label":"needs_review","expected_rule":"AML-007","risk_tier":"high"}
+{"case_id":"c-054","case_text":"Customer requests an international wire of $9,000 to a region recently added to the high-risk jurisdiction list.","label":"flag","expected_rule":"AML-003","risk_tier":"high"}
+{"case_id":"c-055","case_text":"A PEP's close business associate requests onboarding and an initial $15,000 deposit.","label":"flag","expected_rule":"AML-021","risk_tier":"high"}
+{"case_id":"c-056","case_text":"Customer deposits $9,500 in cash and asks the teller whether amounts over $10,000 are reported.","label":"flag","expected_rule":"AML-002","risk_tier":"high"}
+{"case_id":"c-057","case_text":"Verified corporate treasury sweeps $2,000,000 between its own accounts as part of documented cash management.","label":"compliant","expected_rule":"","risk_tier":"medium"}
+{"case_id":"c-058","case_text":"A trade finance transaction shows invoice quantities far exceeding the shipping container capacity declared.","label":"flag","expected_rule":"AML-017","risk_tier":"high"}
+{"case_id":"c-059","case_text":"Customer's account receives a $4,900 deposit and a $4,950 deposit on consecutive days, then a $9,000 outbound wire.","label":"flag","expected_rule":"AML-006","risk_tier":"high"}
+{"case_id":"c-060","case_text":"Established customer increases monthly spending modestly in line with a documented salary raise.","label":"compliant","expected_rule":"AML-024","risk_tier":"low"}
+{"case_id":"c-061","case_text":"A charity sends a one-time $5,000 grant to a domestic verified partner organization.","label":"compliant","expected_rule":"AML-032","risk_tier":"low"}
+{"case_id":"c-062","case_text":"Customer wires $9,200 to a virtual-asset exchange weekly, with amounts consistently below $10,000.","label":"flag","expected_rule":"AML-026","risk_tier":"high"}
+{"case_id":"c-063","case_text":"A legal entity provides beneficial ownership details that cannot be independently verified before a $60,000 transfer.","label":"flag","expected_rule":"AML-005","risk_tier":"high"}
+{"case_id":"c-064","case_text":"Customer deposits $8,000 cash, then visits a second branch the same afternoon to deposit another $8,000 cash.","label":"flag","expected_rule":"AML-027","risk_tier":"high"}
+{"case_id":"c-065","case_text":"Verified vendor receives a scheduled $18,000 payment that is reported and consistent with a multi-year contract.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"c-066","case_text":"Account opened with valid government identification; first transaction is a $500 deposit.","label":"compliant","expected_rule":"AML-023","risk_tier":"low"}
+{"case_id":"c-067","case_text":"Customer sends $9,400 to several different new payees in a high-risk jurisdiction over a single week.","label":"flag","expected_rule":"AML-003","risk_tier":"high"}
+{"case_id":"c-068","case_text":"A respondent bank routes a payment with stripped originator details to obscure the ordering customer.","label":"flag","expected_rule":"AML-010","risk_tier":"high"}
+{"case_id":"c-069","case_text":"A dormant savings account is reactivated with a small $200 deposit by the verified accountholder.","label":"compliant","expected_rule":"AML-013","risk_tier":"low"}
+{"case_id":"c-070","case_text":"Customer purchases three money orders of $2,800 each with cash on the same day.","label":"needs_review","expected_rule":"AML-028","risk_tier":"medium"}
+{"case_id":"c-071","case_text":"Entity 40 percent owned by a sanctioned party requests a transfer; ownership is below the aggregation threshold.","label":"needs_review","expected_rule":"AML-036","risk_tier":"high"}
+{"case_id":"c-072","case_text":"Customer's stated occupation is retiree, yet the account shows high-velocity transfers totaling $400,000 monthly.","label":"flag","expected_rule":"AML-035","risk_tier":"high"}
+{"case_id":"c-073","case_text":"A new corporate customer with a clear operating business and verified owners makes a $30,000 supplier payment.","label":"compliant","expected_rule":"AML-020","risk_tier":"medium"}
+{"case_id":"c-074","case_text":"Funds move through an omnibus account but the underlying customer identification accompanies the movement as required.","label":"compliant","expected_rule":"AML-039","risk_tier":"medium"}
+{"case_id":"c-075","case_text":"Customer deposits cash matching their declared cash-intensive business revenue, supported by sales records.","label":"compliant","expected_rule":"AML-009","risk_tier":"low"}
+{"case_id":"c-076","case_text":"A customer makes a $9,990 cash deposit and states they will return tomorrow with more.","label":"flag","expected_rule":"AML-002","risk_tier":"high"}
+{"case_id":"c-077","case_text":"Cross-border wire of $11,000 with complete originator and beneficiary information, properly reported.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"c-078","case_text":"Customer provides identity documents that fail verification and declines to supply alternatives before a transfer.","label":"flag","expected_rule":"AML-040","risk_tier":"high"}
+{"case_id":"c-079","case_text":"A foreign senior government official opens an account and immediately requests a $250,000 inbound transfer.","label":"flag","expected_rule":"AML-004","risk_tier":"high"}
+{"case_id":"c-080","case_text":"Customer splits a $12,000 currency exchange into two $6,000 exchanges at two branches on the same day.","label":"flag","expected_rule":"AML-033","risk_tier":"high"}

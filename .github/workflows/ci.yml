@@ -1,8 +1,15 @@
 name: ci
+
 on:
-  push: { branches: [main] }
-  pull_request: { branches: [main] }
-permissions: { contents: read, pull-requests: write }
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   lint-type-test:
     runs-on: ubuntu-24.04
@@ -10,13 +17,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
-        with: { version: "0.5.11", python-version: "3.12.4", enable-cache: true }
-      - run: uv sync --all-extras --frozen
-      - run: uv run ruff check . && uv run ruff format --check .
-      - run: uv run mypy --strict src/
+        with:
+          version: "0.5.11"
+          python-version: "3.12.4"
+          enable-cache: true
+      - run: uv sync --all-extras
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Type check
+        run: uv run mypy --strict src/
       - name: Pytest (mocked, 85% coverage)
-        env: { ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}, VOYAGE_API_KEY: test_key }
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VOYAGE_API_KEY: test_key
         run: uv run pytest -q --cov=src/compliance_agent --cov-fail-under=85
+
   eval-smoke:
     if: github.event_name == 'pull_request'
     needs: lint-type-test
@@ -25,8 +42,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
-        with: { version: "0.5.11", python-version: "3.12.4", enable-cache: true }
-      - run: uv sync --all-extras --frozen
+        with:
+          version: "0.5.11"
+          python-version: "3.12.4"
+          enable-cache: true
+      - run: uv sync --all-extras
       - name: Eval smoke (15 cases)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

@@ -21,7 +21,7 @@ jobs:
           version: "0.5.11"
           python-version: "3.12.4"
           enable-cache: true
-      - run: uv sync --all-extras
+      - run: uv sync --all-extras --frozen
       - name: Lint
         run: |
           uv run ruff check .
@@ -46,7 +46,7 @@ jobs:
           version: "0.5.11"
           python-version: "3.12.4"
           enable-cache: true
-      - run: uv sync --all-extras
+      - run: uv sync --all-extras --frozen
       - name: Eval smoke (15 cases)
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

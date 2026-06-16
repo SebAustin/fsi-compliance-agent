@@ -29,8 +29,11 @@ hardcoded — `scripts/calibrate.py` fits it on the labeled set and writes it to
 
 A human. A `high` risk-tier `flag` never auto-closes; it routes through the Slack approval
 gate where a compliance officer **approves** (upholds the flag) or **overrides** (clears
-the case). On timeout the case stays `pending` — the system never auto-approves. The audit
-trail records that approval was required and how it resolved.
+the case). Button clicks come back as a signed Slack interaction to
+`POST /slack/interactivity`, whose request signature is verified (with replay protection)
+before it resolves the gate; `POST /approvals/{id}` is an equivalent programmatic path. On
+timeout the case stays `pending` — the system never auto-approves. The audit trail records
+that approval was required and how it resolved.
 
 ## 5. What is the system's error profile?
 

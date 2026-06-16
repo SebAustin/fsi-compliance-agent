@@ -39,6 +39,10 @@ experience. Write production code. No tutorials.
   approves or overrides. The agent never auto-closes a high-risk flag.
 - Reuse pattern: Slack interactive message with Approve / Override / Request-Info
   buttons; the gate blocks until a response or a configurable timeout.
+- Button clicks resolve the gate via POST /slack/interactivity, which MUST verify
+  the Slack request signature (slack_signing_secret) over the raw body before acting.
+  Resolution can also come from POST /approvals/{id}. On timeout the case stays
+  pending — never auto-approved.
 
 ## Audit contract (examiner-grade)
 - Every node transition appends to a hash-chained audit log. Each entry:

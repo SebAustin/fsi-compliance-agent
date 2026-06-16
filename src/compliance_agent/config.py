@@ -42,6 +42,7 @@ class Settings(BaseSettings):
 
     # Slack HITL
     slack_bot_token: str = ""
+    slack_signing_secret: str = ""  # verifies inbound interactivity callbacks
     slack_approval_channel: str = "#compliance-approvals"
     approval_timeout_s: int = 3600
 

@@ -68,11 +68,16 @@ flowchart LR
 ```bash
 git clone https://github.com/SebAustin/fsi-compliance-agent && cd fsi-compliance-agent
 uv sync && cp .env.example .env   # set OPENAI_API_KEY (or LLM_PROVIDER=anthropic + key)
+make qdrant           # start local Qdrant (docker compose) and wait for ready
 make index            # build rulebook index
 make calibrate        # fit abstention threshold (alpha=0.05) on labeled cases
 make review CASE="Wire transfer of $9,500 to a new payee in a high-risk jurisdiction, structured below the $10k reporting threshold"
 make eval             # full eval on 80 cases
+make qdrant-stop      # tear down Qdrant when done
 ```
+
+> Qdrant runs in Docker via [`docker-compose.yml`](docker-compose.yml); its data persists
+> in a named volume across restarts. `make test` needs neither Qdrant nor API keys.
 
 > **No external services?** The agent degrades gracefully for local development:
 > with `SLACK_BOT_TOKEN` empty the approval gate runs in dry-run mode, and the test

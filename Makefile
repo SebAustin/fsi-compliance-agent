@@ -1,11 +1,13 @@
-.PHONY: help install index calibrate review eval eval-smoke serve test lint type ci clean
+.PHONY: help install qdrant qdrant-stop index calibrate review eval eval-smoke serve test lint type ci clean
 
 PY := uv run
 
 help:
 	@echo "fsi-compliance-agent — make targets"
 	@echo "  install     uv sync (all extras)"
-	@echo "  index       build the rulebook vector index (Qdrant + voyage-3-large)"
+	@echo "  qdrant      start local Qdrant (docker compose) and wait for ready"
+	@echo "  qdrant-stop stop and remove local Qdrant"
+	@echo "  index       build the rulebook vector index (Qdrant + embeddings)"
 	@echo "  calibrate   fit the abstention threshold (alpha=0.05) on labeled cases"
 	@echo "  review      run a single case: make review CASE=\"...\""
 	@echo "  eval        full eval on the 80 labeled cases"
@@ -18,6 +20,17 @@ help:
 
 install:
 	uv sync --all-extras
+
+qdrant:
+	docker compose up -d qdrant
+	@echo "waiting for Qdrant on :6333 ..."
+	@for i in $$(seq 1 30); do \
+		if curl -sf http://localhost:6333/readyz >/dev/null 2>&1; then echo "Qdrant ready"; exit 0; fi; \
+		sleep 1; \
+	done; echo "Qdrant did not become ready in time" >&2; exit 1
+
+qdrant-stop:
+	docker compose down
 
 index:
 	$(PY) python -m scripts.build_index

@@ -63,15 +63,18 @@ class RulebookIndexer:
 
         client = self._qdrant()
         vectors = self._embed([r["clause"] for r in self._rules])
-        client.recreate_collection(  # type: ignore[attr-defined]
-            collection_name=self.settings.qdrant_collection,
+        collection = self.settings.qdrant_collection
+        if client.collection_exists(collection):  # type: ignore[attr-defined]
+            client.delete_collection(collection)  # type: ignore[attr-defined]
+        client.create_collection(  # type: ignore[attr-defined]
+            collection_name=collection,
             vectors_config=VectorParams(size=self.settings.embed_dim, distance=Distance.COSINE),
         )
         points = [
             PointStruct(id=i, vector=vectors[i], payload=self._rules[i])
             for i in range(len(self._rules))
         ]
-        client.upsert(collection_name=self.settings.qdrant_collection, points=points)  # type: ignore[attr-defined]
+        client.upsert(collection_name=collection, points=points)  # type: ignore[attr-defined]
         log.info("rulebook.indexed", count=len(self._rules))
         return len(self._rules)
 

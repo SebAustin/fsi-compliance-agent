@@ -10,6 +10,7 @@ import json
 
 import typer
 
+from compliance_agent.config import get_settings
 from compliance_agent.graph import build_graph
 
 app = typer.Typer(add_completion=False)
@@ -20,7 +21,14 @@ def main(
     case: str = typer.Option(..., "--case", help="Free-text case / transaction description"),
     case_id: str = typer.Option("cli-001", "--case-id"),
 ) -> None:
-    """Run the compliance graph on one case and print the determination."""
+    """Run the compliance graph on one case and print the determination.
+
+    A high-risk flag routes through the Slack approval gate, which blocks for a human
+    decision. On the CLI there is no one to respond, so we shorten the gate timeout to
+    zero: the case surfaces as approval_status="pending" (fail-safe, never auto-closed)
+    instead of blocking for the full approval_timeout_s.
+    """
+    get_settings().approval_timeout_s = 0
     graph = build_graph()
     state = asyncio.run(graph.ainvoke({"case_id": case_id, "case_text": case}))
     determination = state.get("determination")

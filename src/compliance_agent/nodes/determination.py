@@ -30,21 +30,35 @@ log = structlog.get_logger(__name__)
 _DECISIONS_REQUIRING_CITATION: frozenset[str] = frozenset({"compliant", "flag"})
 _JSON_RE = re.compile(r"\{[^{}]*\"decision\"[^{}]*\}", re.DOTALL)
 
+# A triggered prohibition ALWAYS dominates a clearance — otherwise a "below the
+# $10,000 threshold" safe-harbor can be (mis)used to clear the exact sub-threshold
+# pattern that defines structuring. This is the cost-asymmetric error the system
+# exists to prevent, so flag-dominance is stated first and emphatically.
+_FLAG_DOMINANCE = (
+    "CRITICAL — a missed flag is the costliest error: when in doubt, flag or send to "
+    "review; never clear. A clearance or safe-harbor clause may be cited ONLY when NO "
+    "reporting, structuring, sanctions, PEP, or due-diligence rule is triggered. If any "
+    "such rule applies, you MUST decide 'flag' (or 'needs_review') — a clearance clause "
+    "NEVER overrides a triggered rule. In particular, multiple or repeated transactions "
+    "kept below a reporting threshold — including across different days, branches, or "
+    "accounts (e.g. $4,500 one day and $4,800 the next) — are structuring and MUST be "
+    "flagged; they may NOT be cleared on a below-threshold basis."
+)
+
 _CLEARANCE_GUIDANCE = (
     "EVERY determination must cite at least one rule clause — including 'compliant'. "
-    "To clear a case as compliant, cite the rule(s) you evaluated whose conditions "
-    "are NOT met (for example, the reporting-threshold rule the amount falls below, "
-    "or a clearance / safe-harbor clause for routine expected activity) and explain "
-    "in your rationale why each cited rule is not triggered. Decide 'needs_review' "
-    "only when no provided rule is even relevant to the case."
+    "To clear a case as compliant, first confirm no prohibition is triggered, then "
+    "cite the clearance / safe-harbor clause or the reporting-threshold rule whose "
+    "conditions are NOT met, and explain in your rationale why each cited rule is not "
+    "triggered. Decide 'needs_review' only when no provided rule is even relevant."
 )
 
 _SYSTEM = (
     "You are a compliance analyst. Using ONLY the provided rule clauses, determine "
     "whether the case is 'compliant', should be 'flag'ged, or 'needs_review'. "
-    f"{_CLEARANCE_GUIDANCE} After your analysis, output a single JSON object on its "
-    'own line of the form {"decision": "...", "confidence": 0.0} where confidence is '
-    "your calibrated probability (0.0-1.0) that the decision is correct."
+    f"{_FLAG_DOMINANCE} {_CLEARANCE_GUIDANCE} After your analysis, output a single JSON "
+    'object on its own line of the form {"decision": "...", "confidence": 0.0} where '
+    "confidence is your calibrated probability (0.0-1.0) that the decision is correct."
 )
 
 # OpenAI has no native Citations API, so we ask for quoted spans and verify each
@@ -52,9 +66,9 @@ _SYSTEM = (
 _SYSTEM_OPENAI = (
     "You are a compliance analyst. Using ONLY the provided rule clauses, determine "
     "whether the case is compliant, should be flagged, or needs review. "
-    f"{_CLEARANCE_GUIDANCE} You MUST support a 'compliant' or 'flag' decision by "
-    "quoting the exact text of the rule clause(s) you relied on. Respond with ONLY a "
-    'JSON object of the form: {"decision": "compliant|flag|needs_review", '
+    f"{_FLAG_DOMINANCE} {_CLEARANCE_GUIDANCE} You MUST support a 'compliant' or 'flag' "
+    "decision by quoting the exact text of the rule clause(s) you relied on. Respond "
+    'with ONLY a JSON object of the form: {"decision": "compliant|flag|needs_review", '
     '"confidence": 0.0, "rationale": "...", "citations": [{"rule_id": "AML-XXX", '
     '"cited_text": "verbatim substring copied from that rule clause"}]}. '
     "Each cited_text MUST be an exact, verbatim substring of the referenced clause."

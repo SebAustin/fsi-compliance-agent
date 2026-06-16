@@ -49,11 +49,26 @@ tier escalates to `high`, an unreachable approval gate stays `pending`, an uncit
 determination is rejected outright. In a cost-asymmetric domain, the safe default is the
 one that costs an analyst time, not the one that misses a flag.
 
-## Models (pinned Jun 2026)
+## Providers
 
-| Stage | Model | Why |
-|---|---|---|
-| Triage | Haiku 4.5 | cheap, high-volume classification |
-| Determination | Sonnet 4.6 | best reasoning + Citations API |
-| Eval judge | Opus 4.7 | independent, highest-reasoning grader |
-| Embeddings | voyage-3-large (dim 256) | rule-clause retrieval |
+The agent is provider-agnostic via a thin abstraction in `providers.py`; nodes call
+`providers.*` and dispatch on `settings.llm_provider` / `settings.embed_provider`.
+**OpenAI is the default**; Anthropic is fully supported by flipping `LLM_PROVIDER`.
+
+The one provider-specific seam is citations (see `nodes/determination.py`):
+
+- **Anthropic** → native Citations API returns verifiable char offsets.
+- **OpenAI** → structured-output quotes, verified by substring-matching each quote
+  against its cited clause (`_verify_citations`); unverifiable quotes are dropped.
+
+Both paths funnel into the same `CitationContractError` enforcement, so the contract
+is provider-independent.
+
+## Models
+
+| Stage | OpenAI (default) | Anthropic | Why |
+|---|---|---|---|
+| Triage | gpt-4.1-mini | Haiku 4.5 | cheap, high-volume classification |
+| Determination | gpt-4.1 | Sonnet 4.6 | best reasoning + grounded citations |
+| Eval judge | gpt-4.1 | Opus 4.7 | independent, high-reasoning grader |
+| Embeddings (dim 256) | text-embedding-3-large | voyage-3-large | rule-clause retrieval |

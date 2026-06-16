@@ -11,6 +11,7 @@ from typing import get_args
 
 import structlog
 
+from compliance_agent import providers
 from compliance_agent.config import Settings, get_settings
 from compliance_agent.state import CaseState, RiskTier
 
@@ -29,18 +30,20 @@ _SYSTEM = (
 
 
 def _triage_llm(case_text: str, settings: Settings) -> dict[str, str]:
-    """Call Haiku for triage. Returns parsed {case_type, risk_tier}."""
-    import anthropic
-
-    client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
-    message = client.messages.create(
-        model=settings.haiku_model,
-        max_tokens=256,
-        temperature=0.0,
-        system=_SYSTEM,
-        messages=[{"role": "user", "content": case_text}],
-    )
-    text = "".join(block.text for block in message.content if block.type == "text")
+    """Call the configured provider for triage. Returns {case_type, risk_tier}."""
+    if settings.llm_provider == "openai":
+        text = providers.openai_chat(
+            settings,
+            settings.openai_triage_model,
+            _SYSTEM,
+            case_text,
+            json_mode=True,
+            max_tokens=256,
+        )
+    else:
+        text = providers.anthropic_chat(
+            settings, settings.haiku_model, _SYSTEM, case_text, max_tokens=256
+        )
     parsed: dict[str, str] = json.loads(text)
     return parsed
 

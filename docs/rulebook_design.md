@@ -39,9 +39,12 @@ The rulebook spans the pillars an examiner expects:
 ## How a clause becomes a citation
 
 1. Retrieval embeds the case text and finds the top-k clauses (`RulebookIndexer.search`).
-2. Those clauses are passed to Sonnet as **citations-enabled documents**.
+2. Those clauses are passed to the determination model. On Anthropic they go as
+   **citations-enabled documents**; on OpenAI they go as labelled context and the model
+   returns quoted spans.
 3. The model cites spans inside a clause; we map each span back to its `rule_id` and store
-   `(rule_id, cited_text, start_char, end_char)` on the `Determination`.
+   `(rule_id, cited_text, start_char, end_char)` on the `Determination`. On OpenAI the
+   offsets are computed by verifying the quote is a verbatim substring of the clause.
 4. The close node writes the cited `rule_id`s into the audit log.
 
 ## Known gap: cross-references

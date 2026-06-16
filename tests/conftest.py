@@ -32,6 +32,7 @@ def settings(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[config
     config.get_settings.cache_clear()
     instance = config.get_settings()
     instance.audit_log_path = tmp_path / "audit" / "log.jsonl"
+    instance.openai_api_key = ""
     instance.anthropic_api_key = ""
     instance.voyage_api_key = ""
     instance.slack_bot_token = ""

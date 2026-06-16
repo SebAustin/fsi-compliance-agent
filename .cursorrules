@@ -7,18 +7,23 @@ experience. Write production code. No tutorials.
 ## Stack (pinned Jun 2026)
 - Python 3.12.4, uv, ruff 0.8.4, mypy 1.13 --strict, pydantic 2.9.
 - LangGraph 1.0.3 StateGraph + TypedDict. No AgentExecutor.
-- anthropic 0.40.0. Sonnet 4.6 for determinations, Haiku 4.5 for triage,
-  Opus 4.7 for eval judge. Citations API enabled on determinations.
-- qdrant-client 1.12.1 + voyageai 0.3.2 (voyage-3-large, dim 256).
-- slack-sdk 3.33.4 for approval gates. scipy 1.14.1 for conformal calibration.
-- FastAPI 0.115.6, structlog 24.4.0.
+- Provider-agnostic LLM layer (providers.py), default OpenAI, Anthropic supported.
+  - OpenAI: gpt-4.1 for determinations, gpt-4.1-mini for triage, gpt-4.1 for judge,
+    text-embedding-3-large for embeddings.
+  - Anthropic: Sonnet 4.6 / Haiku 4.5 / Opus 4.7 + Citations API; voyage-3-large.
+- qdrant-client 1.12.1. slack-sdk 3.33.4 for approval gates. scipy 1.14.1 for
+  conformal calibration. FastAPI 0.115.6, structlog 24.4.0.
 
 ## Citation contract (HARD — non-negotiable in compliance)
 - Every compliance determination MUST cite the specific rule(s) it relied on,
-  with the rule_id and the cited clause text (char offsets via Citations API).
+  with the rule_id and the cited clause text (verifiable char offsets).
 - A determination with no citation is INVALID — raise CitationContractError.
   In compliance you cannot flag (or clear) a transaction on an uncited basis.
-- The "documents" passed to Citations API are the retrieved rule clauses.
+- Anthropic: citations come from the native Citations API (the "documents" passed
+  are the retrieved rule clauses).
+- OpenAI: the model returns quoted spans; each quote is verified as a verbatim
+  substring of the cited clause and unverifiable quotes are dropped. Same contract,
+  enforced in code — see nodes/determination.py::_verify_citations.
 
 ## Abstention contract (HARD)
 - Determinations carry a confidence score. Below the calibrated threshold τ,

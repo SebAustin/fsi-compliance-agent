@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 
 import structlog
 
+from compliance_agent import providers
 from compliance_agent.config import Settings, get_settings
 
 if TYPE_CHECKING:
@@ -46,15 +47,7 @@ class RulebookIndexer:
     # --- embedding + index build -------------------------------------------------
 
     def _embed(self, texts: Sequence[str]) -> list[list[float]]:
-        import voyageai
-
-        client = voyageai.Client(api_key=self.settings.voyage_api_key)  # type: ignore[attr-defined]
-        result = client.embed(
-            list(texts),
-            model=self.settings.embed_model,
-            output_dimension=self.settings.embed_dim,
-        )
-        return [list(vec) for vec in result.embeddings]
+        return providers.embed_texts(self.settings, texts)
 
     def _qdrant(self) -> object:
         from qdrant_client import QdrantClient

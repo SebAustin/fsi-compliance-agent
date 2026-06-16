@@ -23,20 +23,36 @@ rather than auto-clear a case it isn't sure about.
 
 ## How it works
 
-1. **Triage** — classify case type and risk tier (Haiku 4.5).
-2. **Rule retrieval** — find the rulebook clauses that apply (Qdrant + voyage-3-large).
+1. **Triage** — classify case type and risk tier (fast model).
+2. **Rule retrieval** — find the rulebook clauses that apply (Qdrant + embeddings).
 3. **Determination** — produce a compliant / flag / needs-review decision, with every
-   determination citing the specific rule clause via the Citations API. Uncited → invalid.
+   determination citing the specific rule clause. Uncited → invalid.
 4. **Abstain** — if confidence is below the calibrated threshold, route to human review.
 5. **Approval gate** — high-risk flags go through a Slack approval gate. A compliance
    officer approves or overrides. The agent never auto-closes a high-risk flag.
 6. **Audit** — every step is written to a hash-chained, examiner-grade audit log.
 
+### Provider-agnostic, OpenAI by default
+
+The agent runs on **OpenAI or Anthropic** — set `LLM_PROVIDER` (and `EMBED_PROVIDER`).
+The default is OpenAI (`gpt-4.1` family + `text-embedding-3-large`).
+
+The citation contract holds either way, but the mechanism differs:
+
+- **Anthropic** uses the native **Citations API**, which returns verifiable char
+  offsets into the source document.
+- **OpenAI** has no equivalent, so the agent requests quoted spans via structured
+  output and **verifies each quote by locating it inside the cited rule clause** —
+  a quote the model didn't actually take from the clause is unverifiable and is
+  dropped. A determination left with no verifiable citation is rejected
+  (`CitationContractError`). This makes "cite or you can't decide" enforceable on
+  either provider.
+
 ```mermaid
 flowchart LR
     CASE[Case / transaction] --> TR[triage\ntype + risk tier]
     TR --> RR[rule_retrieval\nrulebook clauses]
-    RR --> DET[determination\nSonnet 4.6 + Citations\nconfidence]
+    RR --> DET[determination\nLLM + verified citations\nconfidence]
     DET --> AB{confidence ≥ τ?}
     AB -->|no| HR[human review queue]
     AB -->|yes| RISK{risk tier?}
@@ -51,7 +67,7 @@ flowchart LR
 
 ```bash
 git clone https://github.com/SebAustin/fsi-compliance-agent && cd fsi-compliance-agent
-uv sync && cp .env.example .env
+uv sync && cp .env.example .env   # set OPENAI_API_KEY (or LLM_PROVIDER=anthropic + key)
 make index            # build rulebook index
 make calibrate        # fit abstention threshold (alpha=0.05) on labeled cases
 make review CASE="Wire transfer of $9,500 to a new payee in a high-risk jurisdiction, structured below the $10k reporting threshold"

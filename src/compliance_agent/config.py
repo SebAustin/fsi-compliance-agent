@@ -7,10 +7,14 @@ from __future__ import annotations
 import functools
 import json
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 CALIBRATION_PATH = Path(".calibration.json")
+
+LlmProvider = Literal["openai", "anthropic"]
+EmbedProvider = Literal["openai", "voyage"]
 
 
 class Settings(BaseSettings):
@@ -18,7 +22,12 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    # LLM + embeddings
+    # Provider selection. Both providers are supported; OpenAI is the default.
+    llm_provider: LlmProvider = "openai"
+    embed_provider: EmbedProvider = "openai"
+
+    # API keys
+    openai_api_key: str = ""
     anthropic_api_key: str = ""
     voyage_api_key: str = ""
 
@@ -36,17 +45,27 @@ class Settings(BaseSettings):
     slack_approval_channel: str = "#compliance-approvals"
     approval_timeout_s: int = 3600
 
-    # Models (pinned Jun 2026)
+    # OpenAI models (triage / determination / eval judge)
+    openai_triage_model: str = "gpt-4.1-mini"
+    openai_determination_model: str = "gpt-4.1"
+    openai_judge_model: str = "gpt-4.1"
+    openai_embed_model: str = "text-embedding-3-large"
+
+    # Anthropic models (pinned Jun 2026)
     haiku_model: str = "claude-haiku-4-5-20250929"
     sonnet_model: str = "claude-sonnet-4-6"
     judge_model: str = "claude-opus-4-7"
+    voyage_embed_model: str = "voyage-3-large"
 
-    # Embeddings
-    embed_model: str = "voyage-3-large"
+    # Embeddings (dimension is shared across providers; both support it)
     embed_dim: int = 256
 
     # Audit
     audit_log_path: Path = Path("audit/audit_log.jsonl")
+
+    def active_llm_key(self) -> str:
+        """API key for the currently selected LLM provider."""
+        return self.openai_api_key if self.llm_provider == "openai" else self.anthropic_api_key
 
     def calibrated_threshold(self) -> float:
         """Return the calibrated abstention threshold if present, else the default.

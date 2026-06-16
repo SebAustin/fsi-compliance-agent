@@ -22,6 +22,7 @@ import typer
 
 from compliance_agent.graph import build_graph
 from compliance_agent.nodes import approval_gate
+from compliance_agent.nodes.exceptions import CitationContractError
 from evals.judge import judge_determination
 
 log = structlog.get_logger(__name__)
@@ -64,12 +65,19 @@ def main(limit: int = typer.Option(0, "--limit")) -> None:
 
     false_negatives = 0
     correct = decided = cited = abstained_n = approvals_required = 0
+    contract_failures = 0
     quality: list[float] = []
 
     for case in cases:
-        state = asyncio.run(
-            graph.ainvoke({"case_id": case["case_id"], "case_text": case["case_text"]})
-        )
+        try:
+            state = asyncio.run(
+                graph.ainvoke({"case_id": case["case_id"], "case_text": case["case_text"]})
+            )
+        except CitationContractError:
+            # An uncited determination is a contract failure, not a silent pass.
+            contract_failures += 1
+            log.warning("eval.contract_failure", case_id=case["case_id"])
+            continue
 
         if state.get("abstained", False):
             abstained_n += 1
@@ -104,6 +112,7 @@ def main(limit: int = typer.Option(0, "--limit")) -> None:
         "citation_coverage": round(cited / decided, 3) if decided else None,
         "abstention_rate": round(abstained_n / n, 3) if n else None,
         "approvals_required": approvals_required,
+        "contract_failures": contract_failures,
         "resolution_quality": round(sum(quality) / len(quality), 3) if quality else None,
     }
 

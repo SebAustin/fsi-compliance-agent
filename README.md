@@ -102,9 +102,11 @@ Tracked as an open issue; the fix is a rule-cross-reference index.
 
 ## A note on the data
 
-The rulebook is **synthetic and originally authored** — 40 rules in an AML/BSA-style
+The rulebook is **synthetic and originally authored** — 45 rules in an AML/BSA-style
 structure (reporting thresholds, structuring, sanctions screening, PEP handling,
-beneficial-ownership). It is not copied from any real regulation. The 80 cases are
+beneficial-ownership, plus 5 clearance / safe-harbor clauses so a *cleared* case can
+also cite the rule it was evaluated against). It is not copied from any real
+regulation. The 80 cases are
 synthetic. This keeps the repo fully shareable while exercising the same logic a
 real rulebook would.
 
@@ -116,7 +118,7 @@ src/compliance_agent/
   graph.py        LangGraph StateGraph wiring
   config.py       pydantic-settings configuration
   nodes/          triage, rule_retrieval, determination, abstain, approval_gate, close
-  rulebook/       indexer + rules.jsonl (40 synthetic rules)
+  rulebook/       indexer + rules.jsonl (45 synthetic rules)
   audit/          hash-chained, examiner-grade audit log
   api/server.py   FastAPI: /review /approvals /audit
 evals/            run_eval.py (false-negative rate is the headline), judge.py, cases.jsonl

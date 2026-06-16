@@ -21,7 +21,7 @@ Each rule is one JSON line in [`src/compliance_agent/rulebook/rules.jsonl`](../s
   retrieval and what gets passed to the Citations API as a document, so cited char
   offsets are verifiable against it.
 
-## Coverage (40 rules)
+## Coverage (45 rules)
 
 The rulebook spans the pillars an examiner expects:
 
@@ -35,6 +35,19 @@ The rulebook spans the pillars an examiner expects:
 | `edd` | enhanced due diligence | AML-014, AML-015, AML-016, AML-032 |
 | `monitoring` | behavioral typologies | AML-008..013, AML-025, AML-026, AML-031, AML-035, AML-038, AML-039 |
 | `wire` / `recordkeeping` | transfer integrity | AML-010, AML-030, AML-037 |
+| `clearance` | safe-harbor / clearance basis | AML-041..045 |
+
+### Why a `clearance` tier exists
+
+AML rulebooks are written as **prohibitions and triggers** ("flag if X"), not affirmative
+permissions — so a genuinely clean transaction often has no rule that says "this is
+allowed." But the citation contract requires *every* determination, including a clearance,
+to cite the rule it relied on (you should be able to show an examiner *why* you cleared a
+case, not just that you did). The `clearance` rules (AML-041..045) provide that affirmative
+basis: routine low-value activity, verified counterparties, below-threshold cash, salary /
+benefit payments, and own-account transfers. A `compliant` determination cites the
+clearance rule (or the threshold rule the amount falls under) and explains why it is not
+triggered.
 
 ## How a clause becomes a citation
 

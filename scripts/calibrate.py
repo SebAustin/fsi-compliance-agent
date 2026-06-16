@@ -24,6 +24,7 @@ import typer
 
 from compliance_agent.config import CALIBRATION_PATH, get_settings
 from compliance_agent.nodes.determination import determination_node
+from compliance_agent.nodes.exceptions import CitationContractError
 from compliance_agent.nodes.rule_retrieval import rule_retrieval_node
 from compliance_agent.nodes.triage import triage_node
 from compliance_agent.state import CaseState
@@ -70,11 +71,21 @@ def main() -> None:
     settings = get_settings()
     cases = _load_cases()
     nonconformity: list[float] = []
+    contract_failures = 0
     for case in cases:
-        correct, score = asyncio.run(_score_case(case))
+        try:
+            correct, score = asyncio.run(_score_case(case))
+        except CitationContractError as exc:
+            # A determination that cannot be cited is not a valid auto-decision; it
+            # is excluded from calibration rather than aborting the whole run.
+            contract_failures += 1
+            log.warning("calibrate.contract_failure", case_id=case["case_id"], error=str(exc))
+            continue
         if correct:
             nonconformity.append(score)
 
+    if contract_failures:
+        log.warning("calibrate.contract_failures_total", count=contract_failures)
     tau = conformal_quantile(nonconformity, settings.abstention_alpha)
     CALIBRATION_PATH.write_text(
         json.dumps(
@@ -88,7 +99,8 @@ def main() -> None:
     )
     typer.echo(
         f"Calibrated tau={tau:.4f} at alpha={settings.abstention_alpha} "
-        f"on {len(nonconformity)} correct determinations -> {CALIBRATION_PATH}"
+        f"on {len(nonconformity)} correct determinations "
+        f"({contract_failures} citation-contract failures excluded) -> {CALIBRATION_PATH}"
     )
 
 

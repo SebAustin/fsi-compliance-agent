@@ -59,6 +59,32 @@ async def test_valid_flag_with_citations(
     assert len(determination.citations) == 2
 
 
+async def test_compliant_with_clearance_citation_passes(
+    settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A cleared case is valid when it cites the clearance rule it evaluated."""
+    monkeypatch.setattr(
+        det,
+        "_determine_llm",
+        lambda *_: {
+            "decision": "compliant",
+            "rationale": "Below the $10,000 reporting threshold; no structuring indicator.",
+            "confidence": 0.92,
+            "citations": [
+                {
+                    "rule_id": "AML-043",
+                    "cited_text": "below the $10,000 reporting threshold",
+                    "start_char": 0,
+                    "end_char": 37,
+                },
+            ],
+        },
+    )
+    result = await det.determination_node(_state())
+    assert result["determination"].decision == "compliant"
+    assert result["determination"].citations[0].rule_id == "AML-043"
+
+
 async def test_uncited_flag_raises(settings: Settings, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         det,

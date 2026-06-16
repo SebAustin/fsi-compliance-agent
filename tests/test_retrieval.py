@@ -10,10 +10,18 @@ from compliance_agent.rulebook.indexer import RulebookIndexer, load_rules
 from compliance_agent.state import CaseState
 
 
-def test_load_rules_has_40() -> None:
+def test_load_rules_has_full_rulebook() -> None:
     rules = load_rules()
-    assert len(rules) == 40
+    assert len(rules) == 45
     assert all({"rule_id", "title", "category", "clause"} <= set(r) for r in rules)
+
+
+def test_rulebook_has_clearance_basis_rules() -> None:
+    """A 'compliant' determination needs an affirmative clause to cite."""
+    rules = load_rules()
+    clearance = [r for r in rules if r["category"] == "clearance"]
+    assert len(clearance) == 5
+    assert {r["rule_id"] for r in clearance} == {f"AML-0{n}" for n in range(41, 46)}
 
 
 def test_local_search_surfaces_relevant_rule(settings: Settings) -> None:

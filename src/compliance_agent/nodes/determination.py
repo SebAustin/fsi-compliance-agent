@@ -30,26 +30,32 @@ log = structlog.get_logger(__name__)
 _DECISIONS_REQUIRING_CITATION: frozenset[str] = frozenset({"compliant", "flag"})
 _JSON_RE = re.compile(r"\{[^{}]*\"decision\"[^{}]*\}", re.DOTALL)
 
+_CLEARANCE_GUIDANCE = (
+    "EVERY determination must cite at least one rule clause — including 'compliant'. "
+    "To clear a case as compliant, cite the rule(s) you evaluated whose conditions "
+    "are NOT met (for example, the reporting-threshold rule the amount falls below, "
+    "or a clearance / safe-harbor clause for routine expected activity) and explain "
+    "in your rationale why each cited rule is not triggered. Decide 'needs_review' "
+    "only when no provided rule is even relevant to the case."
+)
+
 _SYSTEM = (
     "You are a compliance analyst. Using ONLY the provided rule clauses, determine "
-    "whether the case is 'compliant', should be 'flag'ged, or 'needs_review'. Cite "
-    "the specific rule clause for every determination. If no rule supports a "
-    "determination, the case 'needs_review'. After your analysis, output a single "
-    "JSON object on its own line of the form "
-    '{"decision": "...", "confidence": 0.0} where confidence is your calibrated '
-    "probability (0.0-1.0) that the decision is correct."
+    "whether the case is 'compliant', should be 'flag'ged, or 'needs_review'. "
+    f"{_CLEARANCE_GUIDANCE} After your analysis, output a single JSON object on its "
+    'own line of the form {"decision": "...", "confidence": 0.0} where confidence is '
+    "your calibrated probability (0.0-1.0) that the decision is correct."
 )
 
 # OpenAI has no native Citations API, so we ask for quoted spans and verify each
 # quote against the cited clause ourselves (see _verify_citations).
 _SYSTEM_OPENAI = (
     "You are a compliance analyst. Using ONLY the provided rule clauses, determine "
-    "whether the case is compliant, should be flagged, or needs review. You MUST "
-    "support a 'compliant' or 'flag' decision by quoting the exact text of the rule "
-    "clause(s) you relied on. If no rule supports a determination, decide "
-    "'needs_review'. Respond with ONLY a JSON object of the form: "
-    '{"decision": "compliant|flag|needs_review", "confidence": 0.0, '
-    '"rationale": "...", "citations": [{"rule_id": "AML-XXX", '
+    "whether the case is compliant, should be flagged, or needs review. "
+    f"{_CLEARANCE_GUIDANCE} You MUST support a 'compliant' or 'flag' decision by "
+    "quoting the exact text of the rule clause(s) you relied on. Respond with ONLY a "
+    'JSON object of the form: {"decision": "compliant|flag|needs_review", '
+    '"confidence": 0.0, "rationale": "...", "citations": [{"rule_id": "AML-XXX", '
     '"cited_text": "verbatim substring copied from that rule clause"}]}. '
     "Each cited_text MUST be an exact, verbatim substring of the referenced clause."
 )

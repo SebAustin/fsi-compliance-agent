@@ -86,19 +86,31 @@ make qdrant-stop      # tear down Qdrant when done
 
 ## Eval results (v0.1.0, 80 labeled cases)
 
+Measured on the 80 labeled cases with `LLM_PROVIDER=openai` (`gpt-4.1` +
+`text-embedding-3-large`), commit `ce3026f`:
+
 | Metric | Target | v0.1.0 |
 |---|---|---|
-| **False-negative rate** (missed flags) | ≤ 0.03 | **0.02** |
-| Determination accuracy | ≥ 0.85 | **0.87** |
+| **False-negative rate** (missed flags) | ≤ 0.03 | **0.00** |
+| Determination accuracy (auto-decided) | ≥ 0.85 | **1.00** |
 | Citation coverage | 1.00 | **1.00** |
-| Abstention rate | report | **19%** |
-| Conditional accuracy (auto-decided) | ≥ 0.92 | **0.94** |
-| Conformal coverage met (alpha=0.05) | yes | **yes** |
-| Cost per case | < $0.03 | **$0.018** |
+| Abstention rate | report | **5%** |
+| High-risk flags routed to approval | report | **52** |
+| Citation-contract failures (excluded) | report | **2** |
+| Resolution quality (LLM judge) | report | **0.99** |
 
-False-negative rate 0.02: 1 case of 80 was auto-cleared when it should have been
-flagged — a layered-structuring pattern the rulebook covers but the retrieval missed.
-Tracked as an open issue; the fix is a rule-cross-reference index.
+**Read these honestly.** The 80 cases are the **design / calibration set**, not a
+held-out test set — the clearance rules and prompts were tuned against them, so
+accuracy is in-distribution and 1.00 should be read as "no regressions on the known
+set," not a generalization claim. A held-out split is tracked as future work. Two
+cases produced no verifiable citation and were excluded rather than auto-decided (the
+contract failing closed, not open). Accuracy is conditional on the 74 auto-decided
+cases (80 − 4 abstained − 2 contract failures).
+
+The headline that matters: **false-negative rate 0.00** — including the
+layered-structuring case that a "below-threshold" clearance clause briefly caused the
+agent to auto-clear. Flag-dominance now makes a triggered prohibition override any
+clearance, so structuring is flagged, not cleared.
 
 ## A note on the data
 

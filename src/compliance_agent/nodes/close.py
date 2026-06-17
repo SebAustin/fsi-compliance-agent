@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import structlog
 
-from compliance_agent.audit.log import AuditLog
-from compliance_agent.config import get_settings
+from compliance_agent.audit.recorder import record
 from compliance_agent.state import CaseState, Decision
 
 log = structlog.get_logger(__name__)
@@ -26,15 +25,13 @@ def _final_decision(state: CaseState) -> Decision:
 
 async def close_node(state: CaseState) -> CaseState:
     """Finalize the case and append the audit entry."""
-    settings = get_settings()
     determination = state["determination"]
     final = _final_decision(state)
 
-    audit = AuditLog(settings.audit_log_path)
-    audit.append(
-        case_id=state["case_id"],
-        node="close",
-        decision=final,
+    record(
+        state["case_id"],
+        "close",
+        final,
         rule_ids=[c.rule_id for c in determination.citations],
         confidence=determination.confidence,
     )

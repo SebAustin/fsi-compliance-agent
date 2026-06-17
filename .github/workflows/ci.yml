@@ -28,10 +28,7 @@ jobs:
           uv run ruff format --check .
       - name: Type check
         run: uv run mypy --strict src/
-      - name: Pytest (mocked, 85% coverage)
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          VOYAGE_API_KEY: test_key
+      - name: Pytest (fully mocked — no network, no API keys)
         run: uv run pytest -q --cov=src/compliance_agent --cov-fail-under=85
 
   eval-smoke:
@@ -39,6 +36,16 @@ jobs:
     needs: lint-type-test
     runs-on: ubuntu-24.04
     timeout-minutes: 12
+    # Default provider is OpenAI; this job needs OPENAI_API_KEY as a repo secret. When
+    # it is absent (e.g. external-contributor PRs) the job skips rather than fails.
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      QDRANT_URL: http://localhost:6333
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.12.1
+        ports:
+          - 6333:6333
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v4
@@ -47,13 +54,26 @@ jobs:
           python-version: "3.12.4"
           enable-cache: true
       - run: uv sync --all-extras --frozen
+      - name: Gate on OpenAI key
+        id: guard
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::OPENAI_API_KEY not set — skipping eval-smoke."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Wait for Qdrant
+        if: steps.guard.outputs.run == 'true'
+        run: for i in $(seq 1 30); do curl -sf localhost:6333/readyz && break || sleep 1; done
+      - name: Build rulebook index
+        if: steps.guard.outputs.run == 'true'
+        run: uv run python -m scripts.build_index
       - name: Eval smoke (15 cases)
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
-          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+        if: steps.guard.outputs.run == 'true'
         run: uv run python -m evals.run_eval --limit 15
       - uses: marocchino/sticky-pull-request-comment@v2
+        if: steps.guard.outputs.run == 'true'
         with:
           header: eval-smoke
           message: |

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import structlog
 
+from compliance_agent.audit.recorder import record
 from compliance_agent.config import get_settings
 from compliance_agent.state import CaseState
 
@@ -23,6 +24,11 @@ def nonconformity(confidence: float) -> float:
 
 async def abstain_node(state: CaseState) -> CaseState:
     """Decide whether to abstain and whether an approval gate is required."""
+    if state.get("abstained") and "determination" not in state:
+        # Already escalated upstream (e.g. an uncited determination) — keep it routed
+        # to human review without touching a determination that does not exist.
+        return {**state, "approval_required": False}
+
     settings = get_settings()
     threshold = settings.calibrated_threshold()
     determination = state["determination"]
@@ -34,6 +40,7 @@ async def abstain_node(state: CaseState) -> CaseState:
         not abstained and state.get("risk_tier") == "high" and determination.decision == "flag"
     )
 
+    outcome = "abstained" if abstained else ("approval_required" if approval_required else "auto")
     log.info(
         "abstain.evaluated",
         case_id=state["case_id"],
@@ -42,4 +49,5 @@ async def abstain_node(state: CaseState) -> CaseState:
         abstained=abstained,
         approval_required=approval_required,
     )
+    record(state["case_id"], "abstain", outcome, confidence=determination.confidence)
     return {**state, "abstained": abstained, "approval_required": approval_required}

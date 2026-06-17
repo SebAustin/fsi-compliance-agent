@@ -16,6 +16,7 @@ import asyncio
 
 import structlog
 
+from compliance_agent.audit.recorder import record
 from compliance_agent.config import Settings, get_settings
 from compliance_agent.state import CaseState
 
@@ -130,4 +131,5 @@ async def approval_gate_node(state: CaseState) -> CaseState:
     status = await _await_resolution(case_id, event, settings.approval_timeout_s)
 
     log.info("approval.gate_complete", case_id=case_id, status=status)
+    record(case_id, "approval_gate", status)
     return {**state, "approval_status": status}

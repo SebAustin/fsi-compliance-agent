@@ -44,9 +44,12 @@ Reported directly, with the cost-asymmetric error as the headline:
 - **Conditional accuracy** — accuracy among auto-decided (non-abstained) cases.
 - **Citation coverage**, **abstention rate**, **cost per case**.
 
-## Reading a single case (per the roadmap)
+## Reading a single case
 
-A per-case examiner export (`GET /audit/case/{id}`) that renders the full ordered trail —
-triage → rules retrieved → determination → cited clause text → abstention/approval → final
-decision — is the next planned feature. `AuditLog.read_case()` already returns the ordered
-trail; the Markdown rendering is the open work item.
+`GET /audit/case/{case_id}` returns the full ordered trail for one case as a Markdown
+report an examiner can read directly: a timeline of every step (triage → rules retrieved →
+determination → abstention/approval → close) with the outcome, confidence, and cited
+rule_ids at each step, followed by the full text of every cited clause resolved from the
+rulebook. The report header states the audit-log integrity (VERIFIED / FAILED) so the
+reader knows the trail has not been tampered with. Every node records its transition, so
+abstained and escalated cases — not just closed ones — have a complete trail.

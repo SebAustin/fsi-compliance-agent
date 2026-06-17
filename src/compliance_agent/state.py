@@ -63,6 +63,7 @@ class CaseState(TypedDict):
     retrieved_rules: NotRequired[list[dict[str, object]]]
     determination: NotRequired[Determination]
     abstained: NotRequired[bool]
+    escalation_reason: NotRequired[str]  # why an auto-decision was escalated to a human
     approval_required: NotRequired[bool]
     approval_status: NotRequired[str]  # pending / approved / overridden
     final_decision: NotRequired[Decision]

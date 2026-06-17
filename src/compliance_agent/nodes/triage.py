@@ -12,6 +12,7 @@ from typing import get_args
 import structlog
 
 from compliance_agent import providers
+from compliance_agent.audit.recorder import record
 from compliance_agent.config import Settings, get_settings
 from compliance_agent.state import CaseState, RiskTier
 
@@ -68,4 +69,5 @@ async def triage_node(state: CaseState) -> CaseState:
         case_type=case_type,
         risk_tier=risk_tier,
     )
+    record(state["case_id"], "triage", f"{case_type} / risk={risk_tier}")
     return {**state, "case_type": case_type, "risk_tier": risk_tier}

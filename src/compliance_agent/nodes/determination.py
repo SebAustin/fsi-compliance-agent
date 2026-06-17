@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING, Any, cast
 import structlog
 
 from compliance_agent import providers
+from compliance_agent.audit.recorder import record
 from compliance_agent.config import Settings, get_settings
 from compliance_agent.nodes.exceptions import CitationContractError
 from compliance_agent.state import CaseState, CitedRule, Determination
@@ -262,11 +263,19 @@ async def determination_node(state: CaseState) -> CaseState:
             "citation; an uncited determination is invalid in compliance."
         )
 
+    cited = [c.rule_id for c in determination.citations]
     log.info(
         "determination.complete",
         case_id=state["case_id"],
         decision=determination.decision,
         confidence=determination.confidence,
-        rule_ids=[c.rule_id for c in determination.citations],
+        rule_ids=cited,
+    )
+    record(
+        state["case_id"],
+        "determination",
+        determination.decision,
+        rule_ids=cited,
+        confidence=determination.confidence,
     )
     return {**state, "determination": determination}

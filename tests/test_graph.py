@@ -92,3 +92,18 @@ async def test_low_confidence_abstains_to_human(
     state = await graph.ainvoke({"case_id": "c-4", "case_text": "ambiguous case"})
     assert state["abstained"] is True
     assert "final_decision" not in state  # routed to human review, not closed
+
+
+async def test_uncited_determination_escalates_to_human(
+    settings: Settings, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An ungrounded flag (retrieval missed the rule) escalates, never crashes."""
+    settings.abstention_threshold = 0.5
+    _mock_triage(monkeypatch, "high")
+    _mock_determination(monkeypatch, "flag", 0.99, cited=False)  # uncited -> contract error
+
+    graph = build_graph()
+    state = await graph.ainvoke({"case_id": "c-5", "case_text": "ungroundable flag"})
+    assert state["abstained"] is True
+    assert state["escalation_reason"] == "uncited"
+    assert "final_decision" not in state  # human review, not auto-closed

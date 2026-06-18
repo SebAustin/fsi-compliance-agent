@@ -1,11 +1,38 @@
 # fsi-compliance-agent
 
-> A compliance-review agent that cites the rule, knows when to abstain, and refuses
-> to auto-close a high-risk flag without a human. Built by someone who spent 11 years
-> in regulated financial services — and built to survive an examiner reading the audit log.
+> A compliance-review agent that **cites the rule, knows when to abstain, and refuses
+> to auto-close a high-risk flag without a human** — built around the one error that
+> actually costs money in compliance: the missed flag. Built by someone who spent 11
+> years in regulated financial services, and built to survive an examiner reading the
+> audit log.
 
 [![CI](https://github.com/SebAustin/fsi-compliance-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/SebAustin/fsi-compliance-agent/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue)](pyproject.toml)
+[![types: mypy strict](https://img.shields.io/badge/types-mypy%20strict-blue)](pyproject.toml)
+[![lint: ruff](https://img.shields.io/badge/lint-ruff-purple)](pyproject.toml)
+
+**TL;DR** — A LangGraph agent that screens financial transactions against a regulatory
+rulebook and returns a *citation-grounded* determination (every flag quotes the exact
+clause), *conformally abstains* to a human when unsure, routes high-risk flags through a
+*Slack approval gate*, and writes a *hash-chained, examiner-grade audit log*. The eval
+reports the **false-negative rate** as the headline — and it's **0.00**, including on a
+held-out set the rules were never tuned against.
+
+### Results at a glance
+
+| | Calibration (100 cases) | Held-out (28 cases) |
+|---|---|---|
+| **False-negative rate** (the number that matters) | **0.00** | **0.00** |
+| Accuracy (auto-decided) | 1.00 | 1.00 |
+| Citation coverage | 1.00 | 1.00 |
+| Abstention (→ human) | 5% | 14% |
+| Est. cost / case | ~$0.003 | — |
+
+Engineered like production: **80 tests, ~88% coverage, `mypy --strict` + `ruff` clean,
+CI-gated on the false-negative rate**, runs on **OpenAI or Anthropic**. Read the numbers
+honestly — see [Eval results](#eval-results-v010-100-labeled-cases) for the caveats
+(in-distribution calibration set, one documented retrieval-recall limitation).
 
 ## The error that matters in compliance
 
@@ -170,6 +197,44 @@ evals/            run_eval.py (false-negative rate is the headline), judge.py, c
 scripts/          build_index.py, calibrate.py, review.py
 docs/             architecture, rulebook design, examiner notes
 ```
+
+## What this project demonstrates
+
+A compact, end-to-end take on building an LLM system for a high-stakes, regulated domain
+— with the engineering discipline the domain demands:
+
+- **Agentic orchestration** — a typed [LangGraph](https://langchain-ai.github.io/langgraph/)
+  `StateGraph` (triage → retrieval → sanctions screening → determination → abstain →
+  approval → close) with conditional routing and fail-safe escalation.
+- **Grounded generation, enforced** — every determination must cite a rule clause; the
+  citation contract is enforced in code (`CitationContractError`), and on OpenAI each
+  quote is verified as a verbatim substring of the cited clause to catch fabrication.
+- **Uncertainty quantification** — split-conformal abstention calibrated at α=0.05, so
+  the agent routes low-confidence cases to a human instead of guessing.
+- **RAG** — Qdrant + embeddings over a regulatory rulebook, with a deterministic offline
+  fallback and an honestly-reported recall limitation (see issue #4).
+- **Human-in-the-loop** — a Slack approval gate with signed (HMAC, replay-protected)
+  interactivity callbacks; high-risk flags never auto-close.
+- **Deterministic controls where they belong** — sanctions screening is exact + fuzzy
+  list-matching, not model judgment, mirroring real programs.
+- **Auditability** — an append-only, hash-chained audit log with tamper detection and a
+  per-case Markdown examiner report.
+- **Provider-agnostic** — runs on OpenAI or Anthropic behind one abstraction.
+- **Production hygiene** — `mypy --strict`, `ruff` (all rules), 80 tests at ~88% coverage,
+  CI gated on the false-negative rate, pinned deps via `uv`, Docker-Compose for Qdrant.
+- **Honest evaluation** — a held-out test set, a cost metric, and limitations reported as
+  found rather than hidden — the methodology a regulated buyer actually trusts.
+
+**Stack:** Python 3.12 · LangGraph · OpenAI / Anthropic · Qdrant · FastAPI · Pydantic ·
+SciPy (conformal) · slack-sdk · structlog · uv · ruff · mypy.
+
+## Built by
+
+Sebastien Henry — 11 years in regulated financial services, including feeding Federal
+Reserve reporting at BNP Paribas and building National Bank of Canada's national mortgage
+platform. This is the shape of systems shipped in production, rebuilt on a modern agentic
+stack with fully synthetic, shareable data. Open to forward-deployed / AI engineering
+roles in financial services.
 
 ## Sources
 

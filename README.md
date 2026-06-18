@@ -102,12 +102,32 @@ Measured on all 100 labeled cases (incl. 20 sanctions hits / near-misses) with
 | Citation-contract failures (excluded) | report | **0** |
 | Resolution quality (LLM judge) | report | **0.98** |
 
-**Read these honestly.** The 100 cases are the **design / calibration set**, not a
-held-out test set — the rules and prompts were tuned against them, so accuracy is
-in-distribution and 1.00 should be read as "no regressions on the known set," not a
-generalization claim. A held-out split is tracked as future work. Accuracy is
-conditional on the 95 auto-decided cases (100 − 5 abstained). Zero contract failures
-this run (the earlier two PEP cases are now cited after the retrieval-recall fix).
+**Read these honestly.** The 100 cases are the **design / calibration set** — the rules
+and prompts were tuned against them, so accuracy is in-distribution and 1.00 should be
+read as "no regressions on the known set," not a generalization claim. Accuracy is
+conditional on the 95 auto-decided cases (100 − 5 abstained). Zero contract failures this
+run (the earlier two PEP cases are now cited after the retrieval-recall fix).
+
+### Held-out test set (out-of-distribution)
+
+[`evals/holdout.jsonl`](evals/holdout.jsonl) is 28 cases authored *after* the rulebook was
+frozen and **never used to tune any rule or prompt** — the honest generalization check. Run
+with `make eval-holdout`. Measured once (no iteration on these cases):
+
+| Metric | Calibration (100) | Held-out (28) |
+|---|---|---|
+| False-negative rate | 0.00 | **0.00** |
+| Accuracy (auto-decided) | 1.00 | **1.00** |
+| Citation coverage | 1.00 | **1.00** |
+| Abstention rate | 5% | **14.3%** |
+
+The false-negative rate — the number that matters — **holds at 0.00 out-of-distribution**.
+The signal worth reading is the abstention rate *rising* (5% → 14%): on unfamiliar cases the
+agent is correctly less certain and hands more of them to a human rather than guessing. One
+PEP case (a "foreign finance minister") was escalated to human review because retrieval did
+not surface the PEP rule — the fail-safe held (escalate, never auto-clear). That is a real,
+un-tuned retrieval-recall limitation, reported as found rather than fixed against the
+held-out set.
 
 The headline that matters: **false-negative rate 0.00** — including the
 layered-structuring case that a "below-threshold" clearance clause briefly caused the

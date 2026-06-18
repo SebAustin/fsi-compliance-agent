@@ -1,0 +1,28 @@
+{"case_id":"h-001","case_text":"Settlement payment of $42,000 to an individual recorded as Helena Brandt-Vogel.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-002","case_text":"Outgoing wire to a beneficiary named Aurelio Castellanos Reyes for consulting fees.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-003","case_text":"First vendor payment of $55,000 to Granite Harbor Investments LLC.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-004","case_text":"Account opening and an initial deposit by a customer named Ingrid Halvorsen.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-005","case_text":"Transfer instruction naming the payee as Carlos Mendes Ortiz.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-006","case_text":"Remittance to an individual listed as Aurelio Castellano Reyes.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-007","case_text":"Payment to a company recorded as Granite Harbour Investments.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-008","case_text":"A customer made five cash deposits of $1,900 each over five consecutive days at the same branch.","label":"flag","expected_rule":"AML-006","risk_tier":"high"}
+{"case_id":"h-009","case_text":"A business split a $30,000 obligation into four same-day wires of $7,500 each to one payee.","label":"flag","expected_rule":"AML-018","risk_tier":"high"}
+{"case_id":"h-010","case_text":"A $40,000 cash deposit from a documented property sale, filed as a currency transaction report.","label":"compliant","expected_rule":"AML-001","risk_tier":"medium"}
+{"case_id":"h-011","case_text":"A $12,500 cash deposit was accepted but the branch failed to file the required currency transaction report.","label":"flag","expected_rule":"AML-001","risk_tier":"high"}
+{"case_id":"h-012","case_text":"An account held by a foreign finance minister receives a $500,000 inbound wire.","label":"flag","expected_rule":"AML-004","risk_tier":"high"}
+{"case_id":"h-013","case_text":"The adult son of a sitting head of state requests onboarding and a $75,000 transfer.","label":"flag","expected_rule":"AML-021","risk_tier":"high"}
+{"case_id":"h-014","case_text":"A shell company with nominee directors and no disclosed beneficial owner requests a $200,000 outbound payment.","label":"flag","expected_rule":"AML-020","risk_tier":"high"}
+{"case_id":"h-015","case_text":"A new corporate customer completed full beneficial-ownership verification before a routine $20,000 supplier payment consistent with its stated business.","label":"compliant","expected_rule":"AML-042","risk_tier":"medium"}
+{"case_id":"h-016","case_text":"A customer earning $60,000 a year wires $250,000 offshore citing an undocumented inheritance.","label":"flag","expected_rule":"AML-014","risk_tier":"high"}
+{"case_id":"h-017","case_text":"Funds arrive and are wired onward to three different countries within minutes with no business rationale.","label":"flag","expected_rule":"AML-011","risk_tier":"high"}
+{"case_id":"h-018","case_text":"A charity transfers $9,800 weekly to a conflict-affected region with minimal supporting documentation.","label":"needs_review","expected_rule":"AML-032","risk_tier":"high"}
+{"case_id":"h-019","case_text":"A customer purchases $150,000 of cryptocurrency in rapid succession, inconsistent with prior activity.","label":"flag","expected_rule":"AML-026","risk_tier":"high"}
+{"case_id":"h-020","case_text":"An importer's invoices price commodity goods at roughly ten times prevailing market rates.","label":"flag","expected_rule":"AML-017","risk_tier":"high"}
+{"case_id":"h-021","case_text":"An outbound international wire is missing the beneficiary's name and address.","label":"flag","expected_rule":"AML-010","risk_tier":"medium"}
+{"case_id":"h-022","case_text":"A retiree receives a monthly $2,400 pension deposit from a government agency.","label":"compliant","expected_rule":"AML-044","risk_tier":"low"}
+{"case_id":"h-023","case_text":"A customer moves $5,000 between their own verified savings and brokerage accounts.","label":"compliant","expected_rule":"AML-045","risk_tier":"low"}
+{"case_id":"h-024","case_text":"A one-time $300 cash deposit by a long-standing customer, consistent with their normal activity.","label":"compliant","expected_rule":"AML-041","risk_tier":"low"}
+{"case_id":"h-025","case_text":"A recurring $8,000 payment to a verified supplier under a multi-year contract, consistent with history.","label":"compliant","expected_rule":"AML-042","risk_tier":"medium"}
+{"case_id":"h-026","case_text":"A customer named David Morrison, not on any watchlist, sends $9,000 to a verified family member abroad.","label":"compliant","expected_rule":"AML-042","risk_tier":"medium"}
+{"case_id":"h-027","case_text":"A wire to Northwind Maritime Services Ltd, a company whose name partially matches a listed party.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"h-028","case_text":"A dormant retirement account is reactivated solely to receive a small $250 interest posting.","label":"compliant","expected_rule":"AML-041","risk_tier":"low"}

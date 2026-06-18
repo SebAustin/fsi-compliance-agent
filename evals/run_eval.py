@@ -40,12 +40,8 @@ def _git_sha() -> str:
         return "nogit"
 
 
-def _load(limit: int) -> list[dict[str, str]]:
-    rows = [
-        json.loads(line)
-        for line in Path("evals/cases.jsonl").read_text().splitlines()
-        if line.strip()
-    ]
+def _load(limit: int, cases_path: str) -> list[dict[str, str]]:
+    rows = [json.loads(line) for line in Path(cases_path).read_text().splitlines() if line.strip()]
     return rows[:limit] if limit else rows
 
 
@@ -55,13 +51,16 @@ async def _auto_approve(_case_id: str, _event: object, _timeout: int) -> str:
 
 
 @app.command()
-def main(limit: int = typer.Option(0, "--limit")) -> None:
+def main(
+    limit: int = typer.Option(0, "--limit"),
+    cases_path: str = typer.Option("evals/cases.jsonl", "--cases"),
+) -> None:
     """Run the eval and gate CI on false-negative rate + citation coverage."""
     # Mock the human gate without auto-approving in production code paths.
     approval_gate._await_resolution = _auto_approve  # type: ignore[assignment]  # noqa: SLF001
 
     graph = build_graph()
-    cases = _load(limit)
+    cases = _load(limit, cases_path)
 
     false_negatives = 0
     correct = decided = cited = abstained_n = approvals_required = 0

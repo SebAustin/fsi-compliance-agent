@@ -10,7 +10,8 @@ help:
 	@echo "  index       build the rulebook vector index (Qdrant + embeddings)"
 	@echo "  calibrate   fit the abstention threshold (alpha=0.05) on labeled cases"
 	@echo "  review      run a single case: make review CASE=\"...\""
-	@echo "  eval        full eval on the 100 labeled cases"
+	@echo "  eval        full eval on the 100 labeled (calibration) cases"
+	@echo "  eval-holdout eval on the held-out set the rules were not tuned against"
 	@echo "  eval-smoke  eval on a 15-case smoke subset"
 	@echo "  serve       run the FastAPI server"
 	@echo "  test        pytest with coverage (mocked, no network)"
@@ -43,6 +44,9 @@ review:
 
 eval:
 	$(PY) python -m evals.run_eval --limit 100
+
+eval-holdout:
+	$(PY) python -m evals.run_eval --cases evals/holdout.jsonl
 
 eval-smoke:
 	$(PY) python -m evals.run_eval --limit 15

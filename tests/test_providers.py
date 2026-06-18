@@ -101,6 +101,18 @@ def test_triage_dispatches_to_openai(settings: Settings, monkeypatch: pytest.Mon
     assert captured["model"] == settings.openai_triage_model
 
 
+def test_cost_accumulator_records_and_resets() -> None:
+    providers.reset_cost()
+    assert providers.total_cost_usd() == 0.0
+    # gpt-4.1 is $2/1M input, $8/1M output -> 1M in + 1M out = $10.
+    providers._record_cost("gpt-4.1", 1_000_000, 1_000_000)
+    assert providers.total_cost_usd() == pytest.approx(10.0)
+    providers._record_cost("unknown-model", 5_000_000, 5_000_000)  # untracked -> $0
+    assert providers.total_cost_usd() == pytest.approx(10.0)
+    providers.reset_cost()
+    assert providers.total_cost_usd() == 0.0
+
+
 def test_triage_dispatches_to_anthropic(
     settings: Settings, monkeypatch: pytest.MonkeyPatch
 ) -> None:

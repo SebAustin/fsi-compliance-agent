@@ -20,6 +20,38 @@ if TYPE_CHECKING:
 
     from compliance_agent.config import Settings
 
+# --- cost tracking ---------------------------------------------------------------
+# USD per 1M tokens (input, output). ESTIMATE for reporting only — update as vendor
+# pricing changes; embeddings bill input only.
+_PRICE_PER_MTOK: dict[str, tuple[float, float]] = {
+    "gpt-4.1": (2.0, 8.0),
+    "gpt-4.1-mini": (0.4, 1.6),
+    "text-embedding-3-large": (0.13, 0.0),
+    "claude-sonnet-4-6": (3.0, 15.0),
+    "claude-haiku-4-5-20250929": (1.0, 5.0),
+    "claude-opus-4-7": (15.0, 75.0),
+}
+
+_cost_usd = 0.0
+
+
+def reset_cost() -> None:
+    """Reset the accumulated cost counter (call at the start of an eval run)."""
+    global _cost_usd  # noqa: PLW0603 - process-wide accumulator
+    _cost_usd = 0.0
+
+
+def total_cost_usd() -> float:
+    """Estimated USD spent since the last reset."""
+    return _cost_usd
+
+
+def _record_cost(model: str, input_tokens: int, output_tokens: int) -> None:
+    global _cost_usd  # noqa: PLW0603 - process-wide accumulator
+    in_price, out_price = _PRICE_PER_MTOK.get(model, (0.0, 0.0))
+    _cost_usd += input_tokens / 1e6 * in_price + output_tokens / 1e6 * out_price
+
+
 # --- chat (sync) -----------------------------------------------------------------
 
 
@@ -49,6 +81,9 @@ def openai_chat(
         ],
         **kwargs,
     )
+    usage = response.usage
+    if usage is not None:
+        _record_cost(model, usage.prompt_tokens, usage.completion_tokens)
     return response.choices[0].message.content or ""
 
 
@@ -71,6 +106,7 @@ def anthropic_chat(
         system=system,
         messages=[{"role": "user", "content": user}],
     )
+    _record_cost(model, message.usage.input_tokens, message.usage.output_tokens)
     return "".join(block.text for block in message.content if block.type == "text")
 
 
@@ -93,6 +129,9 @@ async def openai_chat_async(
             {"role": "user", "content": user},
         ],
     )
+    usage = response.usage
+    if usage is not None:
+        _record_cost(model, usage.prompt_tokens, usage.completion_tokens)
     return response.choices[0].message.content or ""
 
 
@@ -110,6 +149,7 @@ async def anthropic_chat_async(
         system=system,
         messages=[{"role": "user", "content": user}],
     )
+    _record_cost(model, message.usage.input_tokens, message.usage.output_tokens)
     return "".join(block.text for block in message.content if block.type == "text")
 
 
@@ -127,6 +167,8 @@ def embed_texts(settings: Settings, texts: Sequence[str]) -> list[list[float]]:
             input=list(texts),
             dimensions=settings.embed_dim,
         )
+        if response.usage is not None:
+            _record_cost(settings.openai_embed_model, response.usage.prompt_tokens, 0)
         return [list(item.embedding) for item in response.data]
 
     import voyageai

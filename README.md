@@ -50,6 +50,11 @@ The citation contract holds either way, but the mechanism differs:
   (`CitationContractError`). This makes "cite or you can't decide" enforceable on
   either provider.
 
+> Status: the OpenAI path is the default and is what every eval number below was
+> measured on. The Anthropic path is fully wired and unit-tested (mocked) but has not
+> been run live here — set `LLM_PROVIDER=anthropic` with a real key to exercise the
+> native Citations API end to end.
+
 ```mermaid
 flowchart LR
     CASE[Case / transaction] --> TR[triage\ntype + risk tier]
@@ -101,6 +106,11 @@ Measured on all 100 labeled cases (incl. 20 sanctions hits / near-misses) with
 | High-risk flags routed to approval | report | **64** |
 | Citation-contract failures (excluded) | report | **0** |
 | Resolution quality (LLM judge) | report | **0.98** |
+| Estimated cost per case | < $0.03 | **~$0.003** |
+
+Cost is an estimate at list token prices (see `_PRICE_PER_MTOK` in
+[`providers.py`](src/compliance_agent/providers.py)) and *includes* the eval's LLM-judge
+call, which production review would not incur — so real per-case cost is lower.
 
 **Read these honestly.** The 100 cases are the **design / calibration set** — the rules
 and prompts were tuned against them, so accuracy is in-distribution and 1.00 should be

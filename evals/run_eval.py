@@ -20,6 +20,7 @@ from pathlib import Path
 import structlog
 import typer
 
+from compliance_agent import providers
 from compliance_agent.graph import build_graph
 from compliance_agent.nodes import approval_gate
 from compliance_agent.nodes.exceptions import CitationContractError
@@ -59,6 +60,7 @@ def main(
     # Mock the human gate without auto-approving in production code paths.
     approval_gate._await_resolution = _auto_approve  # type: ignore[assignment]  # noqa: SLF001
 
+    providers.reset_cost()
     graph = build_graph()
     cases = _load(limit, cases_path)
 
@@ -113,6 +115,8 @@ def main(
         "approvals_required": approvals_required,
         "contract_failures": contract_failures,
         "resolution_quality": round(sum(quality) / len(quality), 3) if quality else None,
+        "est_cost_usd_total": round(providers.total_cost_usd(), 4),
+        "est_cost_usd_per_case": round(providers.total_cost_usd() / n, 4) if n else None,
     }
 
     out = Path("evals/runs") / _git_sha()

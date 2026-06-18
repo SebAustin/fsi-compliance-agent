@@ -10,7 +10,7 @@ help:
 	@echo "  index       build the rulebook vector index (Qdrant + embeddings)"
 	@echo "  calibrate   fit the abstention threshold (alpha=0.05) on labeled cases"
 	@echo "  review      run a single case: make review CASE=\"...\""
-	@echo "  eval        full eval on the 80 labeled cases"
+	@echo "  eval        full eval on the 100 labeled cases"
 	@echo "  eval-smoke  eval on a 15-case smoke subset"
 	@echo "  serve       run the FastAPI server"
 	@echo "  test        pytest with coverage (mocked, no network)"
@@ -42,7 +42,7 @@ review:
 	$(PY) python -m scripts.review --case "$(CASE)"
 
 eval:
-	$(PY) python -m evals.run_eval --limit 80
+	$(PY) python -m evals.run_eval --limit 100
 
 eval-smoke:
 	$(PY) python -m evals.run_eval --limit 15

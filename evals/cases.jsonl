@@ -78,3 +78,23 @@
 {"case_id":"c-078","case_text":"Customer provides identity documents that fail verification and declines to supply alternatives before a transfer.","label":"flag","expected_rule":"AML-040","risk_tier":"high"}
 {"case_id":"c-079","case_text":"A foreign senior government official opens an account and immediately requests a $250,000 inbound transfer.","label":"flag","expected_rule":"AML-004","risk_tier":"high"}
 {"case_id":"c-080","case_text":"Customer splits a $12,000 currency exchange into two $6,000 exchanges at two branches on the same day.","label":"flag","expected_rule":"AML-033","risk_tier":"high"}
+{"case_id":"c-081","case_text":"Outgoing wire of $18,000 to a new payee named Dmitri Sokolov.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-082","case_text":"Payment of $60,000 to a counterparty, Crimson Delta Trading FZE, for goods.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-083","case_text":"International transfer of $9,000 instructed to a beneficiary named Viktor Morozov.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-084","case_text":"Trade settlement payable to Northwind Maritime Holdings Ltd for a shipping invoice.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-085","case_text":"Inbound remittance of $25,000 from an individual identified as Farah Al-Nuaimi.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-086","case_text":"Account opening request and initial $5,000 deposit by a customer named Tomas Kovacs.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-087","case_text":"Letter of credit payment to Oceanic Bridge Petroleum for a fuel cargo.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-088","case_text":"Wire of $14,500 to a personal account held by Yelena Petrova.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-089","case_text":"Vendor onboarding and a $30,000 first payment to Carlos Ortiz.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-090","case_text":"Freight payment to Meridian Arc Shipping for container transport.","label":"flag","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-091","case_text":"Outbound transfer to a beneficiary whose name is spelled Viktor Morozof.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-092","case_text":"Payment instruction naming the beneficiary as Dmitri Sokolow.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-093","case_text":"Invoice settlement to a supplier listed as Crimson Delta Trades FZE.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-094","case_text":"Remittance to an individual recorded as Helena Brandt Vogl.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-095","case_text":"Transfer to a payee named Rashid Al-Mansour for consulting services.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-096","case_text":"Logistics payment to a company named Silverpeek Logistics Group.","label":"needs_review","expected_rule":"AML-046","risk_tier":"high"}
+{"case_id":"c-097","case_text":"Recurring $12,000 invoice paid to David Thompson, a verified long-standing vendor with consistent prior activity.","label":"compliant","expected_rule":"AML-042","risk_tier":"medium"}
+{"case_id":"c-098","case_text":"Domestic transfer of $800 to Maria Garcia, a verified counterparty with a documented relationship.","label":"compliant","expected_rule":"AML-042","risk_tier":"low"}
+{"case_id":"c-099","case_text":"Routine payroll deposit of $4,100 from Jonathan Webb's established employer.","label":"compliant","expected_rule":"AML-044","risk_tier":"low"}
+{"case_id":"c-100","case_text":"Transfer of $2,000 between a customer's own verified checking and savings accounts.","label":"compliant","expected_rule":"AML-045","risk_tier":"low"}

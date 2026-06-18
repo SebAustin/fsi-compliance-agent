@@ -21,7 +21,7 @@ Each rule is one JSON line in [`src/compliance_agent/rulebook/rules.jsonl`](../s
   retrieval and what gets passed to the Citations API as a document, so cited char
   offsets are verifiable against it.
 
-## Coverage (45 rules)
+## Coverage (46 rules)
 
 The rulebook spans the pillars an examiner expects:
 
@@ -29,7 +29,7 @@ The rulebook spans the pillars an examiner expects:
 |---|---|---|
 | `reporting` | threshold reporting & aggregation | AML-001, AML-019, AML-028, AML-033 |
 | `structuring` | sub-threshold & layered evasion | AML-002, AML-006, AML-018, AML-027, AML-034 |
-| `sanctions` | watchlist & ownership screening | AML-003, AML-007, AML-022, AML-036 |
+| `sanctions` | watchlist, name-match & ownership screening | AML-003, AML-007, AML-022, AML-036, AML-046 |
 | `pep` | politically exposed persons & associates | AML-004, AML-021 |
 | `kyc` | identity & beneficial ownership | AML-005, AML-020, AML-023, AML-024, AML-029, AML-040 |
 | `edd` | enhanced due diligence | AML-014, AML-015, AML-016, AML-032 |
@@ -48,6 +48,23 @@ basis: routine low-value activity, verified counterparties, below-threshold cash
 benefit payments, and own-account transfers. A `compliant` determination cites the
 clearance rule (or the threshold rule the amount falls under) and explains why it is not
 triggered.
+
+## Sanctions watchlist + name-match
+
+Sanctions screening is **deterministic**, not model judgment — that mirrors real
+programs, where you screen names against a list. [`rulebook/watchlist.jsonl`](../src/compliance_agent/rulebook/watchlist.jsonl)
+holds 16 synthetic, originally-authored parties (individuals and entities, each with
+optional aliases). [`sanctions.py`](../src/compliance_agent/sanctions.py) screens the case
+text:
+
+- **Exact match** (normalized name or alias is present) → score 1.0 → must be flagged
+  and gated by a human (the screening node forces `risk_tier=high`).
+- **Fuzzy near-match** (token-window `difflib` ratio ≥ `sanctions_fuzzy_threshold`, default
+  0.85, but < 1.0) → potential hit → must go to human review, never auto-cleared.
+
+The asymmetry is deliberate: a missed true match is a sanctions violation, a false match
+costs only review time. The screening node injects AML-046 and AML-007 into the retrieved
+set on a hit so the determination can ground its citation.
 
 ## How a clause becomes a citation
 

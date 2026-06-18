@@ -61,6 +61,7 @@ class CaseState(TypedDict):
     case_type: NotRequired[str]
     risk_tier: NotRequired[RiskTier]
     retrieved_rules: NotRequired[list[dict[str, object]]]
+    sanctions_hits: NotRequired[list[dict[str, object]]]
     determination: NotRequired[Determination]
     abstained: NotRequired[bool]
     escalation_reason: NotRequired[str]  # why an auto-decision was escalated to a human

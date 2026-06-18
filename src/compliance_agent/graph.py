@@ -20,6 +20,7 @@ from compliance_agent.nodes import (
     triage_node,
 )
 from compliance_agent.nodes.exceptions import CitationContractError
+from compliance_agent.nodes.sanctions_screening import sanctions_screening_node
 from compliance_agent.state import CaseState
 
 if TYPE_CHECKING:
@@ -66,6 +67,7 @@ def build_graph() -> CompiledStateGraph[CaseState, Any, Any, Any]:
 
     graph.add_node("triage", triage_node)
     graph.add_node("rule_retrieval", rule_retrieval_node)
+    graph.add_node("sanctions_screening", sanctions_screening_node)
     graph.add_node("determination", _determination_or_escalate)
     graph.add_node("abstain", abstain_node)
     graph.add_node("approval_gate", approval_gate_node)
@@ -73,7 +75,8 @@ def build_graph() -> CompiledStateGraph[CaseState, Any, Any, Any]:
 
     graph.add_edge(START, "triage")
     graph.add_edge("triage", "rule_retrieval")
-    graph.add_edge("rule_retrieval", "determination")
+    graph.add_edge("rule_retrieval", "sanctions_screening")
+    graph.add_edge("sanctions_screening", "determination")
     graph.add_edge("determination", "abstain")
     graph.add_conditional_edges(
         "abstain",

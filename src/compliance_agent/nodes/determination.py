@@ -245,11 +245,30 @@ def _to_determination(raw: dict[str, object]) -> Determination:
     )
 
 
+def _screening_note(state: CaseState) -> str:
+    """Render deterministic sanctions hits as a note appended to the case text."""
+    hits = state.get("sanctions_hits") or []
+    if not hits:
+        return ""
+    lines = [
+        f"- {str(h['match_type']).upper()} match to watchlist party "
+        f"'{h['matched_name']}' (id {h['watchlist_id']}, score {h['score']})"
+        for h in hits
+    ]
+    return (
+        "\n\nDETERMINISTIC SANCTIONS SCREENING RESULT (authoritative — not your "
+        "judgment): the following watchlist matches were found. An EXACT match must be "
+        "flagged (cite AML-046/AML-007); a FUZZY near-match must go to needs_review.\n"
+        + "\n".join(lines)
+    )
+
+
 async def determination_node(state: CaseState) -> CaseState:
     """Produce a cited determination; reject uncited compliant/flag decisions."""
     settings = get_settings()
     retrieved = state.get("retrieved_rules", [])
-    raw = _determine_llm(state["case_text"], retrieved, settings)
+    case_text = state["case_text"] + _screening_note(state)
+    raw = _determine_llm(case_text, retrieved, settings)
     determination = _to_determination(raw)
 
     if determination.decision in _DECISIONS_REQUIRING_CITATION and not determination.citations:

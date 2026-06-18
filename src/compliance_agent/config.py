@@ -61,6 +61,10 @@ class Settings(BaseSettings):
     # Embeddings (dimension is shared across providers; both support it)
     embed_dim: int = 256
 
+    # Sanctions screening: a fuzzy name-match at or above this ratio (but below an
+    # exact match) is treated as a near-match requiring human review.
+    sanctions_fuzzy_threshold: float = 0.85
+
     # Audit
     audit_log_path: Path = Path("audit/audit_log.jsonl")
 

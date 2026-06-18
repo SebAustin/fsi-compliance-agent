@@ -10,13 +10,20 @@ graph runs offline in tests and local dev.
 
 ```
 START
-  -> triage            (Haiku 4.5)   case_type + risk_tier
-  -> rule_retrieval    (Qdrant/voyage, token-overlap fallback)  retrieved_rules
-  -> determination     (Sonnet 4.6 + Citations API)  Determination
-  -> abstain           (conformal)   abstained?, approval_required?
+  -> triage              (fast model)  case_type + risk_tier
+  -> rule_retrieval      (Qdrant + embeddings, token-overlap fallback)  retrieved_rules
+  -> sanctions_screening (deterministic watchlist name-match)  sanctions_hits
+  -> determination       (LLM + verified citations)  Determination
+  -> abstain             (conformal)   abstained?, approval_required?
   -> { human_review (END) | approval_gate -> close | close }
   -> END
 ```
+
+`sanctions_screening` runs deterministically (not via the LLM): it name-matches every
+party against the synthetic watchlist. An exact match forces `risk_tier=high` (so the
+resulting flag is gated by a human) and guarantees the sanctions rules are citable; a
+fuzzy near-match is surfaced to the determination for human review. See
+[`sanctions.py`](../src/compliance_agent/sanctions.py).
 
 The conditional edge after `abstain` is the heart of the routing:
 

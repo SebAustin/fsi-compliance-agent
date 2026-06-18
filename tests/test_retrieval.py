@@ -12,7 +12,7 @@ from compliance_agent.state import CaseState
 
 def test_load_rules_has_full_rulebook() -> None:
     rules = load_rules()
-    assert len(rules) == 45
+    assert len(rules) == 46
     assert all({"rule_id", "title", "category", "clause"} <= set(r) for r in rules)
 
 

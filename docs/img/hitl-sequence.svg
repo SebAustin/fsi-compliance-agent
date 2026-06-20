@@ -1,0 +1,99 @@
+<svg viewBox="0 0 1160 540" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ttl desc" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <title id="ttl">High-risk flag — human-in-the-loop approval lifecycle</title>
+  <desc id="desc">Sequence: a caller requests a review; the graph runs triage, determination, hybrid retrieval and deterministic sanctions screening; a high-risk flag is posted to Slack; a compliance officer approves or overrides; the signed callback is HMAC-verified; the case is closed and appended to the audit log; on timeout it stays pending.</desc>
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#475569"/>
+    </marker>
+    <style>
+      .hd{font-weight:600;font-size:13px;text-anchor:middle}
+      .hs{font-size:10.5px;text-anchor:middle;fill:#64748b}
+      .msg{font-size:12px;fill:#334155;text-anchor:middle}
+      .ln{stroke:#475569;stroke-width:1.6;fill:none;marker-end:url(#arw)}
+      .lnd{stroke:#94a3b8;stroke-width:1.5;fill:none;stroke-dasharray:5 4;marker-end:url(#arw)}
+      .life{stroke:#cbd5e1;stroke-width:1.3;stroke-dasharray:2 5}
+      .num{font-size:11px;font-weight:700;fill:#ffffff;text-anchor:middle}
+    </style>
+  </defs>
+
+  <rect x="6" y="6" width="1148" height="528" rx="16" fill="#ffffff" stroke="#e6e9ef"/>
+  <text x="32" y="42" font-size="20" font-weight="700" fill="#0f172a">High-risk flag — human-in-the-loop lifecycle</text>
+  <text x="32" y="63" font-size="13" fill="#64748b">A high-risk flag never auto-closes; it waits for a signed human decision, and fails safe on timeout.</text>
+
+  <!-- lifelines -->
+  <line class="life" x1="112"  y1="100" x2="112"  y2="500"/>
+  <line class="life" x1="304"  y1="100" x2="304"  y2="500"/>
+  <line class="life" x1="496"  y1="100" x2="496"  y2="500"/>
+  <line class="life" x1="688"  y1="100" x2="688"  y2="500"/>
+  <line class="life" x1="880"  y1="100" x2="880"  y2="500"/>
+  <line class="life" x1="1072" y1="100" x2="1072" y2="500"/>
+
+  <!-- actor headers -->
+  <g filter="url(#sh)">
+    <rect x="40"  y="80" width="144" height="42" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+    <rect x="232" y="80" width="144" height="42" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+    <rect x="424" y="80" width="144" height="42" rx="10" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="616" y="80" width="144" height="42" rx="10" fill="#ecfdf5" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="808" y="80" width="144" height="42" rx="10" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.5"/>
+    <rect x="1000" y="80" width="144" height="42" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  </g>
+  <text class="hd" x="112"  y="100" fill="#1e293b">Caller</text><text class="hs" x="112" y="114">API / CLI</text>
+  <text class="hd" x="304"  y="100" fill="#312e81">Compliance graph</text><text class="hs" x="304" y="114">LangGraph</text>
+  <text class="hd" x="496"  y="100" fill="#065f46">LLM</text><text class="hs" x="496" y="114">OpenAI · Anthropic</text>
+  <text class="hd" x="688"  y="100" fill="#065f46">Slack</text><text class="hs" x="688" y="114">approvals</text>
+  <text class="hd" x="880"  y="100" fill="#92400e">Officer</text><text class="hs" x="880" y="114">compliance</text>
+  <text class="hd" x="1072" y="100" fill="#1e293b">Audit log</text><text class="hs" x="1072" y="114">hash-chained</text>
+
+  <!-- step number helper circles + messages -->
+  <!-- 1 -->
+  <circle cx="40" cy="150" r="10" fill="#6366f1"/><text class="num" x="40" y="154">1</text>
+  <path class="ln" d="M112 158 L300 158"/>
+  <text class="msg" x="208" y="150">review(case)</text>
+  <!-- 2 -->
+  <circle cx="40" cy="192" r="10" fill="#6366f1"/><text class="num" x="40" y="196">2</text>
+  <path class="ln" d="M308 200 L492 200"/>
+  <text class="msg" x="400" y="192">triage + determination</text>
+  <path class="lnd" d="M492 214 L308 214"/>
+  <text class="msg" x="400" y="228" font-size="11" fill="#64748b">verified citations</text>
+  <!-- 3 self -->
+  <circle cx="40" cy="258" r="10" fill="#6366f1"/><text class="num" x="40" y="262">3</text>
+  <path class="ln" d="M304 252 q70 0 70 14 q0 14 -66 14"/>
+  <text class="msg" x="470" y="264" text-anchor="start" font-size="11.5">hybrid retrieval + deterministic sanctions screen</text>
+  <!-- 4 -->
+  <circle cx="40" cy="300" r="10" fill="#6366f1"/><text class="num" x="40" y="304">4</text>
+  <path class="ln" d="M308 308 L1068 308"/>
+  <text class="msg" x="690" y="300">append  triage … determination</text>
+  <!-- 5 -->
+  <circle cx="40" cy="342" r="10" fill="#6366f1"/><text class="num" x="40" y="346">5</text>
+  <path class="ln" d="M308 350 L684 350"/>
+  <text class="msg" x="496" y="342">post  Approve / Override / Request-Info</text>
+  <!-- 6 -->
+  <circle cx="40" cy="384" r="10" fill="#f59e0b"/><text class="num" x="40" y="388">6</text>
+  <path class="ln" d="M876 392 L692 392"/>
+  <text class="msg" x="784" y="384">clicks a button</text>
+  <!-- 7 -->
+  <circle cx="40" cy="426" r="10" fill="#10b981"/><text class="num" x="40" y="430">7</text>
+  <path class="lnd" d="M684 434 L308 434"/>
+  <text class="msg" x="496" y="426">signed interaction — HMAC verified, replay-protected</text>
+  <!-- 8 -->
+  <circle cx="40" cy="462" r="10" fill="#6366f1"/><text class="num" x="40" y="466">8</text>
+  <path class="ln" d="M308 470 L1068 470"/>
+  <text class="msg" x="690" y="462">append  close (final decision)</text>
+  <!-- 9 -->
+  <circle cx="40" cy="496" r="10" fill="#6366f1"/><text class="num" x="40" y="500">9</text>
+  <path class="lnd" d="M300 504 L116 504"/>
+  <text class="msg" x="208" y="496">determination + status</text>
+
+  <!-- safety callouts -->
+  <g filter="url(#sh)">
+    <rect x="980" y="150" width="150" height="44" rx="9" fill="#fff1f2" stroke="#fb7185" stroke-width="1.3"/>
+    <rect x="980" y="206" width="150" height="44" rx="9" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.3"/>
+  </g>
+  <text x="1055" y="168" font-size="11" font-weight="600" fill="#9f1239" text-anchor="middle">never auto-closed</text>
+  <text x="1055" y="183" font-size="10.5" fill="#e11d48" text-anchor="middle">high-risk + flag</text>
+  <text x="1055" y="224" font-size="11" font-weight="600" fill="#92400e" text-anchor="middle">timeout → pending</text>
+  <text x="1055" y="239" font-size="10.5" fill="#b45309" text-anchor="middle">fail-safe, no auto-approve</text>
+</svg>

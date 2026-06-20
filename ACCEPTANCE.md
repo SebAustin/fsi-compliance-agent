@@ -56,3 +56,16 @@ Input: "enhance the readme with a high quality architecture diagram." Docs-only.
   the graph, plus a sequence diagram for the high-risk HITL approval lifecycle.
 - Verified: Mermaid parses/renders with the live engine (same as GitHub); 5 subgraphs / 5
   ends balanced; all class references defined. No code touched — 97 tests remain green.
+
+---
+
+## Addendum — diagram visual polish (branch `agency/pretty-diagrams`)
+
+Input: "make the diagrams more attractive." Docs-only.
+
+- Replaced the default-themed Mermaid with two bespoke hand-designed SVGs in `docs/img/`
+  (`architecture.svg`, `hitl-sequence.svg`): cohesive 5-color palette, soft depth, rounded
+  cards, drawn audit padlock, legend mapping colors → the four contracts, numbered HITL
+  swimlane with fail-safe callouts. Embedded via `<img>` (GitHub renders committed SVGs).
+- Verified: both SVGs well-formed XML and rendered with the live SVG engine before commit;
+  long crossing connectors removed for clarity. No code touched — 97 tests green.

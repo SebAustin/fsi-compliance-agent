@@ -85,20 +85,114 @@ The citation contract holds either way, but the mechanism differs:
 > been run live here — set `LLM_PROVIDER=anthropic` with a real key to exercise the
 > native Citations API end to end.
 
+### Architecture
+
+A LangGraph `StateGraph` orchestrates the review; deterministic controls (sanctions
+screening, conformal abstention, the citation contract, the hash-chained audit log) sit
+*around* the LLM, not inside it. Solid arrows are the case's path; dotted arrows are
+calls to data/services; every node appends to the audit log.
+
 ```mermaid
-flowchart LR
-    CASE[Case / transaction] --> TR[triage\ntype + risk tier]
-    TR --> RR[rule_retrieval\nrulebook clauses]
-    RR --> SX[sanctions_screening\nwatchlist name-match]
-    SX --> DET[determination\nLLM + verified citations\nconfidence]
-    DET --> AB{confidence ≥ τ?}
-    AB -->|no| HR[human review queue]
-    AB -->|yes| RISK{risk tier?}
-    RISK -->|high + flag| AG[Slack approval gate]
-    RISK -->|low/med| CLOSE[auto-close with citation]
-    AG --> CLOSE
-    CLOSE --> AUD[(hash-chained audit log)]
-    HR --> AUD
+flowchart TB
+    classDef node fill:#eef2ff,stroke:#4f46e5,color:#1e1b4b;
+    classDef decision fill:#fef2f2,stroke:#dc2626,color:#7f1d1d;
+    classDef ext fill:#ecfdf5,stroke:#059669,color:#064e3b;
+    classDef ctrl fill:#fff7ed,stroke:#c2410c,color:#7c2d12;
+    classDef sink fill:#f1f5f9,stroke:#475569,color:#0f172a;
+
+    subgraph ING[" Ingress "]
+        API["FastAPI<br/>/review · /approvals · /slack/interactivity · /audit"]
+        CLI["CLI<br/>make review"]
+    end
+
+    subgraph GRAPH[" LangGraph compliance pipeline "]
+        direction TB
+        TR["triage<br/>case type · risk tier"]
+        RR["rule_retrieval<br/>hybrid dense + lexical RRF"]
+        SX["sanctions_screening<br/>deterministic watchlist match"]
+        DET["determination<br/>decision + verified citations"]
+        AB{"abstain?<br/>conformal τ"}
+        RISK{"high-risk<br/>flag?"}
+        AG["approval_gate<br/>Slack HITL"]
+        HR["human review"]
+        CLOSE["close<br/>final decision"]
+        TR --> RR --> SX --> DET --> AB
+        AB -- "low confidence" --> HR
+        AB -- "confident" --> RISK
+        RISK -- "yes" --> AG --> CLOSE
+        RISK -- "no" --> CLOSE
+    end
+
+    subgraph EXT[" External services "]
+        LLM["LLM<br/>OpenAI · Anthropic"]
+        VDB["Qdrant<br/>vector store"]
+        SLK["Slack"]
+    end
+
+    subgraph DATA[" Rulebook & controls "]
+        RULES["rules.jsonl<br/>46 AML rules"]
+        WL["watchlist.jsonl"]
+        CAL["calibration τ<br/>alpha = 0.05"]
+    end
+
+    subgraph AUD[" Examiner-grade audit "]
+        LOG[("hash-chained<br/>audit log")]
+        REP["/audit/case/{id}<br/>Markdown report"]
+    end
+
+    API --> TR
+    CLI --> TR
+    TR -.-> LLM
+    RR -.-> VDB
+    RR -.-> RULES
+    SX -.-> WL
+    DET -.-> LLM
+    DET -.-> RULES
+    AB -.-> CAL
+    AG <-.-> SLK
+    TR -.-> LOG
+    RR -.-> LOG
+    SX -.-> LOG
+    DET -.-> LOG
+    AG -.-> LOG
+    CLOSE -.-> LOG
+    HR -.-> LOG
+    LOG --> REP
+
+    class API,CLI,TR,RR,SX,DET,AG,HR,CLOSE node
+    class AB,RISK decision
+    class LLM,VDB,SLK ext
+    class RULES,WL,CAL ctrl
+    class LOG,REP sink
+```
+
+The four enforced **contracts** map onto the graph: **citation** (`determination` — a
+compliant/flag with no verifiable citation is rejected), **abstention** (`abstain` —
+below the conformal threshold τ, route to a human), **approval gate** (`approval_gate` —
+high-risk flags never auto-close), **audit** (every node → hash-chained log).
+
+### High-risk flag — human-in-the-loop lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Caller (API / CLI)
+    participant G as Compliance graph
+    participant L as LLM
+    participant S as Slack
+    participant O as Compliance officer
+    participant A as Audit log
+    U->>G: review(case)
+    G->>L: triage + determination (with retrieved rules)
+    G->>G: hybrid retrieval + deterministic sanctions screen
+    Note over G: high-risk + flag → never auto-closed
+    G->>A: append triage … determination
+    G->>S: post Approve / Override / Request-Info
+    O->>S: clicks a button
+    S-->>G: signed interaction (HMAC verified, replay-protected)
+    G->>A: append close (final decision)
+    G-->>U: determination + approval_status
+    Note over G,A: on timeout → stays pending (fail-safe, never auto-approve)
 ```
 
 ## Quickstart

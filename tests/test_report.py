@@ -88,3 +88,28 @@ def test_audit_case_endpoint_returns_markdown(settings: Settings, client: TestCl
 def test_audit_case_404_for_unknown_case(client: TestClient) -> None:
     response = client.get("/audit/case/does-not-exist")
     assert response.status_code == 404
+
+
+def test_sanctions_screening_renders_human_label() -> None:
+    """The sanctions_screening node must render as 'Sanctions screening', not raw."""
+    entries = [
+        {
+            "timestamp": "2026-06-17T10:00:00",
+            "case_id": "c-2",
+            "node": "sanctions_screening",
+            "decision": "hit / exact",
+            "rule_ids_cited": ["AML-046"],
+            "confidence": None,
+            "hash_prev": "0",
+            "hash_self": "a",
+        },
+    ]
+    md = render_case_report(
+        "c-2",
+        entries,  # type: ignore[arg-type]
+        _RULES,
+        integrity_ok=True,
+    )
+    assert "Sanctions screening" in md
+    # Raw node name must NOT appear as a table cell (it should be translated)
+    assert "| sanctions_screening |" not in md

@@ -47,19 +47,33 @@ def _entry_hash(prev: str, hashed: dict[str, object]) -> str:
 
 
 class AuditLog:
-    """Append-only hash-chained audit log backed by a JSONL file."""
+    """Append-only hash-chained audit log backed by a JSONL file.
+
+    ``_cached_last_hash`` keeps the most recent hash in memory so repeated
+    ``append()`` calls skip the O(n) file read.  This cache assumes a single
+    writer process; ``verify()`` always reads from disk so tamper detection is
+    never affected by the cache.
+    """
 
     def __init__(self, path: Path) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # Lazily initialised on the first append; None means "not yet read".
+        self._cached_last_hash: str | None = None
 
-    def _last_hash(self) -> str:
+    def _read_last_hash_from_file(self) -> str:
+        """Read the last recorded hash directly from disk (used for lazy init)."""
         if not self.path.exists():
             return GENESIS_HASH
         lines = self.path.read_text().splitlines()
         if not lines:
             return GENESIS_HASH
         return str(json.loads(lines[-1])["hash_self"])
+
+    def _last_hash(self) -> str:
+        if self._cached_last_hash is None:
+            self._cached_last_hash = self._read_last_hash_from_file()
+        return self._cached_last_hash
 
     def append(
         self,
@@ -84,6 +98,8 @@ class AuditLog:
         entry: AuditEntry = {**hashed, "hash_self": hash_self}  # type: ignore[typeddict-item]
         with self.path.open("a") as handle:
             handle.write(json.dumps(entry) + "\n")
+        # Update in-memory cache so the next append avoids a disk read.
+        self._cached_last_hash = hash_self
         return hash_self
 
     def verify(self) -> bool:

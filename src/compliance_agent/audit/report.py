@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 _NODE_LABELS = {
     "triage": "Triage",
     "rule_retrieval": "Rule retrieval",
+    "sanctions_screening": "Sanctions screening",
     "determination": "Determination",
     "abstain": "Abstention check",
     "approval_gate": "Approval gate",

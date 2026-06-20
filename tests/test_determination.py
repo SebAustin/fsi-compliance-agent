@@ -144,3 +144,23 @@ def test_build_documents_enables_citations() -> None:
     docs = det._build_documents([{"rule_id": "AML-001", "clause": "text"}])
     assert docs[0]["citations"] == {"enabled": True}
     assert docs[0]["title"] == "AML-001"
+
+
+def test_parse_decision_uses_last_json_block() -> None:
+    """A stray earlier JSON block must not override the terminal decision."""
+    rationale = (
+        'Consider the rule: {"decision": "compliant", "confidence": 0.5}. '
+        "However, on further review the transaction constitutes structuring. "
+        '{"decision": "flag", "confidence": 0.9}'
+    )
+    decision, confidence = det._parse_decision_json(rationale)
+    assert decision == "flag"
+    assert confidence == pytest.approx(0.9)
+
+
+def test_parse_decision_single_block_unchanged() -> None:
+    """Single JSON block behaves identically to the original first-match logic."""
+    text = 'Analysis complete. {"decision": "compliant", "confidence": 0.85}'
+    decision, confidence = det._parse_decision_json(text)
+    assert decision == "compliant"
+    assert confidence == pytest.approx(0.85)

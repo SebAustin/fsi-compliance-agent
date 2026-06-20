@@ -65,7 +65,8 @@ def main(
     cases = _load(limit, cases_path)
 
     false_negatives = 0
-    correct = decided = cited = abstained_n = approvals_required = 0
+    correct = decided = abstained_n = approvals_required = 0
+    must_cite = must_cite_covered = 0  # citation coverage over the contract's population
     contract_failures = 0
     quality: list[float] = []
 
@@ -89,8 +90,13 @@ def main(
             continue
 
         decided += 1
-        if determination.citations:
-            cited += 1
+        # Citation coverage is measured over the population the contract governs —
+        # compliant/flag must cite; needs_review is exempt by design (see
+        # determination._DECISIONS_REQUIRING_CITATION), so it is not counted here.
+        if determination.decision in {"compliant", "flag"}:
+            must_cite += 1
+            if determination.citations:
+                must_cite_covered += 1
         if state.get("approval_required"):
             approvals_required += 1
 
@@ -110,7 +116,7 @@ def main(
         "n": n,
         "false_negative_rate": round(false_negatives / n, 3) if n else None,
         "determination_accuracy": round(correct / decided, 3) if decided else None,
-        "citation_coverage": round(cited / decided, 3) if decided else None,
+        "citation_coverage": round(must_cite_covered / must_cite, 3) if must_cite else None,
         "abstention_rate": round(abstained_n / n, 3) if n else None,
         "approvals_required": approvals_required,
         "contract_failures": contract_failures,

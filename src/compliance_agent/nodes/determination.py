@@ -43,7 +43,10 @@ _FLAG_DOMINANCE = (
     "NEVER overrides a triggered rule. In particular, multiple or repeated transactions "
     "kept below a reporting threshold — including across different days, branches, or "
     "accounts (e.g. $4,500 one day and $4,800 the next) — are structuring and MUST be "
-    "flagged; they may NOT be cleared on a below-threshold basis."
+    "flagged; they may NOT be cleared on a below-threshold basis. Likewise, ANY "
+    "involvement of a sanctioned or watchlisted party — including partial or indirect "
+    "ownership below a bright-line threshold — is residual sanctions exposure and may "
+    "NOT be auto-cleared; decide at least 'needs_review'."
 )
 
 _CLEARANCE_GUIDANCE = (
@@ -94,10 +97,12 @@ def _build_documents(retrieved_rules: Sequence[dict[str, object]]) -> list[dict[
 
 
 def _parse_decision_json(text: str) -> tuple[str, float]:
-    match = _JSON_RE.search(text)
-    if not match:
+    # Use the LAST match so a stray earlier JSON block in the rationale prose
+    # cannot override the terminal decision block emitted by the model.
+    matches = _JSON_RE.findall(text)
+    if not matches:
         return "needs_review", 0.0
-    payload = json.loads(match.group(0))
+    payload = json.loads(matches[-1])
     decision = str(payload.get("decision", "needs_review"))
     confidence = float(payload.get("confidence", 0.0))
     return decision, max(0.0, min(1.0, confidence))

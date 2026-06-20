@@ -43,3 +43,16 @@ project and enhance if needed." Verdict from `solution-verifier`: **SOLID (5.00/
 - Live-eval JSON artifacts were generated against the working tree immediately before the
   final commit; the committed bytes match, and the 97 deterministic tests run against the
   committed code.
+
+---
+
+## Addendum — architecture diagram pass (branch `agency/arch-diagram`)
+
+Input: "enhance the readme with a high quality architecture diagram." Docs-only.
+
+- Replaced the basic README flowchart with two styled, GitHub-native Mermaid diagrams: a
+  color-coded layered architecture (ingress → LangGraph pipeline → external services /
+  rulebook controls → cross-cutting hash-chained audit) with the four contracts mapped onto
+  the graph, plus a sequence diagram for the high-risk HITL approval lifecycle.
+- Verified: Mermaid parses/renders with the live engine (same as GitHub); 5 subgraphs / 5
+  ends balanced; all class references defined. No code touched — 97 tests remain green.
